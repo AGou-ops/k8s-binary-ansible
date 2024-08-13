@@ -1,0 +1,5 @@
+server = "https://{{ registry_server }}"
+
+[host."https://{{ registry_server }}"]
+  ca = "/etc/containerd/root-ca.crt"
+  capabilities = ["pull", "resolve", "push"]

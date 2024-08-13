@@ -1,20 +1,37 @@
 ---
-- name: cilium | Create manifest
-  template:
-    src: "{{item.src}}"
-    dest: "{{item.dest}}"
-  with_items:
-    - {src: "cilium.yaml.j2", dest: "/tmp/cilium.yaml"}
+- name: Unarchive cilium.tgz
+  ansible.builtin.unarchive:
+    src: cilium-1.16.1.tgz
+    dest: "{{ k8s_manifests_dir }}"
   delegate_to: "{{ groups['master'][0] }}"
   run_once: true
-  tags:
-    - cilium
-    - cilium_yaml
+  tags: cilium
 
-- name: cilium | Apply manifest
-  shell: "kubectl apply -f /tmp/cilium.yaml"
+- name: Replace cilium chart image registry
+  shell: |
+    helm uninstall cilium -n kube-system || echo
+    cd {{ k8s_manifests_dir }}/cilium
+    sed -i "s/useDigest: true/useDigest: false/g" values.yaml
+    sed -i 's/repository: "/repository: "registry.local:5000\//g' values.yaml
   delegate_to: "{{ groups['master'][0] }}"
   run_once: true
-  tags:
-    - cilium
-    - cilium_install
+  tags: cilium
+
+- name: Helm install cilium
+  ansible.builtin.command:
+    cmd: >
+      helm install cilium .
+          --create-namespace -n kube-system
+          --set hubble.relay.enabled=true
+          --set hubble.ui.enabled=true
+          --set prometheus.enabled=true
+          --set operator.prometheus.enabled=true
+          --set hubble.enabled=true
+          --set hubble.metrics.enabled="{dns,drop,tcp,flow,port-distribution,icmp,http}"
+          --set ipam.operator.clusterPoolIPv4PodCIDRList={{ kubernetes.pods_subnet }}
+          --set ipv4NativeRoutingCIDR={{ kubernetes.pods_subnet }}
+          --set operator.replicas=1
+    chdir: "{{ k8s_manifests_dir }}/cilium"
+  delegate_to: "{{ groups['master'][0] }}"
+  run_once: true
+  tags: cilium

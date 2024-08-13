@@ -1,0 +1,43 @@
+- name: Set timezone
+  community.general.timezone:
+    name: Asia/Shanghai
+  tags: timezone
+
+- name: prepare some dirs
+  file: name={{ item }} state=directory
+  with_items:
+  - "/etc/chrony"
+  - "/var/lib/chrony"
+  - "/var/log/chrony"
+
+- name: Copy chrony binary to sbin (For REHL dist)
+  copy: src=chronyd dest=/usr/sbin/chronyd mode=0755
+  when: 'ansible_distribution in ["CentOS","RedHat","Amazon","Aliyun"]'
+
+- name: Create chronyd service file
+  template: src=chronyd.service.j2 dest=/etc/systemd/system/chronyd.service
+
+- name: Configure chrony server
+  template: src=server.conf.j2 dest=/etc/chrony/chrony.conf
+  when: 'inventory_hostname == groups.master[0]'
+
+- name: Configure chrony client
+  template: src=client.conf.j2 dest=/etc/chrony/chrony.conf
+  when: 'inventory_hostname != groups.master[0]'
+
+- name: Auto start chronyd
+  shell: systemctl enable chronyd
+  ignore_errors: true
+
+- name: Reload and restart chronyd
+  shell: systemctl daemon-reload && systemctl restart chronyd
+  ignore_errors: true
+  tags: restart_chronyd
+
+- name: Wait chronyd start
+  shell: "systemctl is-active chronyd.service"
+  register: svc_status
+  until: '"active" in svc_status.stdout'
+  retries: 3
+  delay: 3
+  tags: restart_chronyd

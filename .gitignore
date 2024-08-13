@@ -11,3 +11,9 @@
 # Vscode files
 .vscode
 
+inventory
+binary
+certs
+images
+local-registry-data.tar.gz
+./roles/addons/files/charts.tar.gz

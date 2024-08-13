@@ -5,40 +5,27 @@
     use: systemd
   tags: hostname
 
+- name: "Update /etc/hosts"
+  ansible.builtin.template:
+    src: hosts.j2
+    dest: /etc/hosts
+    owner: root
+    group: root
+    mode: 0644
+  tags: hosts
+
 - name: "Set env"
   copy:
     src: "ipenv.sh"
     dest: "/etc/profile.d/"
   tags: os_env
 
-- name: "Set timezone"
-  community.general.timezone:
-    name: Asia/Shanghai
-  tags: timezone
-
-- name: "Install chrony"
-  package:
-    name: chrony
-    state: present
-  tags: ntp
-
-- name: "Generate NTP configuration file"
-  template:
-    src: "chrony.conf.j2"
-    dest: "/etc/chrony.conf"
-  when:
-    - ntp.manage_config
-  tags: ntp
-
-- name: Ensure NTP service is started and enabled
-  systemd:
-     name: chronyd
-     state: restarted
-     enabled: yes
-     masked: false
-  tags: ntp
-
 - name: "Disable swap"
+  ansible.posix.sysctl:
+    name: vm.swappiness
+    value: '0'
+
+- name: "Turn swap off"
   shell: swapoff -a
   tags: swap
 
@@ -52,12 +39,23 @@
     - none
   tags: swap
 
-- name: "Disable selinux"
-  selinux:
-    state: disabled
-  when:
-    - ansible_os_family in ['RedHat', 'AlmaLinux', 'Rocky']
-  tags: selinux
+# Require libserlinux-python3 package
+# yum install libselinux-python3
+# - name: "Disable SELinux"
+#   ansible.posix.selinux:
+#     state: disabled
+#   tags: selinux
+#   ignore_errors: yes
+
+- name: "Temp close SElinux"
+  shell: "setenforce 0"
+  failed_when: false
+
+- name: "Disable SElinux"
+  lineinfile:
+    dest: /etc/selinux/config
+    regexp: "^SELINUX="
+    line: "SELINUX=disabled"
 
 - name: "Get firewalld is installed"
   command: whereis firewalld
@@ -72,23 +70,24 @@
     state: stopped
   tags: firewalld
 
-- name: "Set ssh"
-  lineinfile:
-    dest: "/etc/ssh/sshd_config"
-    regexp: "^{{ item.regexp }}"
-    line: "{{ item.line }}"
-    state: present
-  with_items:
-    - { regexp: "UseDNS", line: "UseDNS no" }
-    - { regexp: "ClientAliveInterval", line: "ClientAliveInterval 600" }
-    - { regexp: "ClientAliveCountMax", line: "ClientAliveCountMax 2" }
-    - { regexp: "AddressFamily", line: "AddressFamily inet" }
-    - { regexp: "PermitRootLogin", line: "PermitRootLogin yes" }
-    - { regexp: "PermitEmptyPasswords", line: "PermitEmptyPasswords no" }
-    - { regexp: "PasswordAuthentication", line: "PasswordAuthentication no" }
-  notify:
-    - restart sshd
-  tags: sshd
+# TODO: donot edit ssh config
+# - name: "Set ssh"
+#   lineinfile:
+#     dest: "/etc/ssh/sshd_config"
+#     regexp: "^{{ item.regexp }}"
+#     line: "{{ item.line }}"
+#     state: present
+#   with_items:
+#     - { regexp: "UseDNS", line: "UseDNS no" }
+#     - { regexp: "ClientAliveInterval", line: "ClientAliveInterval 600" }
+#     - { regexp: "ClientAliveCountMax", line: "ClientAliveCountMax 2" }
+#     - { regexp: "AddressFamily", line: "AddressFamily inet" }
+#     - { regexp: "PermitRootLogin", line: "PermitRootLogin yes" }
+#     - { regexp: "PermitEmptyPasswords", line: "PermitEmptyPasswords no" }
+#     - { regexp: "PasswordAuthentication", line: "PasswordAuthentication no" }
+#   notify:
+#     - restart sshd
+#   tags: sshd
 
 - name: "Set limits"
   pam_limits:
@@ -141,6 +140,7 @@
     - {name: 'net.ipv4.tcp_keepalive_intvl',value: '30' }
     - {name: 'net.ipv4.tcp_keepalive_probes',value: '10' }
     - {name: 'net.ipv4.ip_local_port_range',value: '20000 60999' }
+    - {name: 'net.ipv4.ip_nonlocal_bind',value: '1' }
   tags: sysctl
 
 - name: "Config systemd-journald"
@@ -156,43 +156,44 @@
     - ansible_os_family in ['RedHat', 'AlmaLinux', 'Rocky']
   tags: journal
 
-- name: "Install base application"
-  package:
-    name:
-      - vim
-      - mtr
-      - tar
-      - curl
-      - wget
-      - lsof
-      - unzip
-      - lrzsz
-      - rsync
-      - telnet
-      - bash-completion
-    state: present
-  tags: install_app
-
-- name: "Install base application"
-  package:
-    name:
-      - nmap-ncat
-      - yum-utils
-      - nfs-utils
-      - iproute
-    state: present
-  when:
-    - ansible_os_family in ['RedHat', 'AlmaLinux', 'Rocky']
-  tags: install_app
-
-- name: "Install base application"
-  package:
-    name:
-      - nmap
-      - nmap-common
-      - nfs-common
-      - iproute2
-    state: present
-  when:
-    - ansible_os_family in ["Debian"]
-  tags: install_app
+  # TODO:
+# - name: "Install base application"
+#   package:
+#     name:
+#       - vim
+#       - mtr
+#       - tar
+#       - curl
+#       - wget
+#       - lsof
+#       - unzip
+#       - lrzsz
+#       - rsync
+#       - telnet
+#       - bash-completion
+#     state: present
+#   tags: install_app
+#
+# - name: "Install base application"
+#   package:
+#     name:
+#       - nmap-ncat
+#       - yum-utils
+#       - nfs-utils
+#       - iproute
+#     state: present
+#   when:
+#     - ansible_os_family in ['RedHat', 'AlmaLinux', 'Rocky']
+#   tags: install_app
+#
+# - name: "Install base application"
+#   package:
+#     name:
+#       - nmap
+#       - nmap-common
+#       - nfs-common
+#       - iproute2
+#     state: present
+#   when:
+#     - ansible_os_family in ["Debian"]
+#   tags: install_app

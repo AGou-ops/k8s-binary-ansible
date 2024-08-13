@@ -1,0 +1,13 @@
+---
+- name: Installing client tools
+  ansible.builtin.unarchive:
+    src: "{{ item.src }}"
+    dest: /usr/local/bin
+    owner: root
+    group: root
+    mode: '0755'
+  loop:
+    - { src: "socat-1.8.0.0-linux-amd64.tar.gz" }
+    - { src: "conntrack-tools-1.4.6-linux-amd64.tar.gz" }
+    - { src: "ipvsadm-1.31-linux-amd64.tar.gz" }
+    - { src: "jq-1.7.1-linux-amd64.tar.gz" }

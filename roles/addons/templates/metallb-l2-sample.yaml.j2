@@ -1,0 +1,14 @@
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: sample-addrpool
+  namespace: metallb-system
+spec:
+  addresses:
+  - "{{ metallb.l2_addr_range }}"
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: sample
+  namespace: metallb-system

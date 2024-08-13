@@ -156,7 +156,7 @@ oom_score = {{ containerd.oom_score | default(0) }}
       key_model = "node"
 
     [plugins."io.containerd.grpc.v1.cri".registry]
-      config_path = ""
+      config_path = "/etc/containerd/certs.d/"
 
       [plugins."io.containerd.grpc.v1.cri".registry.auths]
 
@@ -166,8 +166,8 @@ oom_score = {{ containerd.oom_score | default(0) }}
 
       [plugins."io.containerd.grpc.v1.cri".registry.mirrors]
 {% for registry, addr in containerd.registries.items() %}
-        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."{{ registry }}"]
-          endpoint = ["{{ ([ addr ] | flatten ) | join('","') }}"]
+        # [plugins."io.containerd.grpc.v1.cri".registry.mirrors."{{ registry }}"]
+        #   endpoint = ["{{ ([ addr ] | flatten ) | join('","') }}"]
 {% endfor %}
 
     [plugins."io.containerd.grpc.v1.cri".x509_key_pair_streaming]

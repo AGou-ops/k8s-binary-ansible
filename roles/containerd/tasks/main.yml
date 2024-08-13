@@ -1,61 +1,62 @@
 ---
-- name: "Install dependency"
-  package:
-    name:
-      - util-linux
-      - libseccomp
-      - libseccomp-devel
-    state: present
-  when:
-    - ansible_os_family in ['RedHat', 'AlmaLinux', 'Rocky']
-  tags: containerd_app
+# TODO: fix \"unknown\" package manager
+# - name: "Install dependency"
+#   package:
+#     name:
+#       - util-linux
+#       - libseccomp
+#       - libseccomp-devel
+#     state: present
+#   when:
+#     - ansible_os_family in ['RedHat', 'AlmaLinux', 'Rocky']
+#   tags: containerd_app
+#
+# - name: "Install dependency"
+#   package:
+#     name:
+#       - util-linux
+#       - libseccomp2
+#     state: present
+#   when:
+#     - ansible_os_family in ["Debian"]
+#   tags: containerd_app
 
-- name: "Install dependency"
-  package:
-    name:
-      - util-linux
-      - libseccomp2
-    state: present
-  when:
-    - ansible_os_family in ["Debian"]
-  tags: containerd_app
-
-- name: "Add nvidia-container-toolkit repository"
-  yum_repository:
-    name: "{{ item.name }}"
-    description: "{{ item.description}}"
-    file: nvidia-container-toolkit
-    baseurl: "{{ item.baseurl }}"
-    repo_gpgcheck: no
-    gpgcheck: no
-    sslverify: yes
-    sslcacert: "/etc/pki/tls/certs/ca-bundle.crt"
-    enabled: yes
-  with_items:
-    - { name: "nvidia-container-toolkit",description: "nvidia-container-toolkit",baseurl: "{{ repo.nvidia_container_toolkit_centos }}" }
-  when:
-    - gpu is defined and gpu == 'true'
-    - ansible_os_family in ['RedHat', 'AlmaLinux', 'Rocky']
-  tags: gpu_runtime
-
-- name: "Add nvidia-container-toolkit repository"
-  apt_repository:
-    repo: "{{ repo.nvidia_container_toolkit_ubuntu }}"
-    filename: nvidia-container-toolkit
-    state: present
-  when:
-    - gpu is defined and gpu == 'true'
-    - ansible_os_family in ["Debian"]
-  tags: gpu_runtime
-
-- name: "Install nvidia-container-runtime"
-  package:
-    name: 
-      - nvidia-container-runtime
-      - nvidia-container-toolkit
-    state: present
-  when: gpu is defined and gpu == 'true'
-  tags: gpu_app
+# - name: "Add nvidia-container-toolkit repository"
+#   yum_repository:
+#     name: "{{ item.name }}"
+#     description: "{{ item.description}}"
+#     file: nvidia-container-toolkit
+#     baseurl: "{{ item.baseurl }}"
+#     repo_gpgcheck: no
+#     gpgcheck: no
+#     sslverify: yes
+#     sslcacert: "/etc/pki/tls/certs/ca-bundle.crt"
+#     enabled: yes
+#   with_items:
+#     - { name: "nvidia-container-toolkit",description: "nvidia-container-toolkit",baseurl: "{{ repo.nvidia_container_toolkit_centos }}" }
+#   when:
+#     - gpu is defined and gpu == 'true'
+#     - ansible_os_family in ['RedHat', 'AlmaLinux', 'Rocky']
+#   tags: gpu_runtime
+#
+# - name: "Add nvidia-container-toolkit repository"
+#   apt_repository:
+#     repo: "{{ repo.nvidia_container_toolkit_ubuntu }}"
+#     filename: nvidia-container-toolkit
+#     state: present
+#   when:
+#     - gpu is defined and gpu == 'true'
+#     - ansible_os_family in ["Debian"]
+#   tags: gpu_runtime
+#
+# - name: "Install nvidia-container-runtime"
+#   package:
+#     name:
+#       - nvidia-container-runtime
+#       - nvidia-container-toolkit
+#     state: present
+#   when: gpu is defined and gpu == 'true'
+#   tags: gpu_app
 
 - name: Install runc
   copy:
@@ -120,7 +121,30 @@
     state: directory
   tags: containerd_config
 
-- name: "Set containerd config"
+- name: "Create containerd cert.d directory"
+  file:
+    path: "/etc/containerd/certs.d/{{ registry_server }}"
+    state: directory
+    mode: '0755'
+    force: yes
+
+- name: "Copy root-ca.crt to /etc/containerd/"
+  ansible.builtin.copy:
+    src: root-ca.crt
+    dest: /etc/containerd/
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: "Template hosts.toml.j2"
+  ansible.builtin.template:
+    src: hosts.toml.j2
+    dest: "/etc/containerd/certs.d/{{ registry_server }}/hosts.toml"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: "Template containerd config"
   template:
     src: "config.toml.j2"
     dest: "/etc/containerd/config.toml"
@@ -149,4 +173,10 @@
     group: root
     mode: 0644
   tags: cri_tools
-  
+
+- name: Install nerdctl
+  unarchive:
+    src: "{{ download.dest }}/nerdctl/{{ nerdctl.version }}/nerdctl-{{ nerdctl.version.replace('v', '') }}-linux-amd64.tar.gz"
+    dest: "/usr/local/bin/"
+    remote_src: no
+  tags: install_nerdctl

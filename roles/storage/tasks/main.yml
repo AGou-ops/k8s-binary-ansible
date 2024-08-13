@@ -1,0 +1,11 @@
+---
+- name: Set up Local-path-provisioner
+  ansible.builtin.include_tasks:
+    file: local-path-provisioner.yml
+    apply:
+      tags:
+        - storage
+        - local-path-provisioner
+  tags:
+    - storage
+    - local-path-provisioner

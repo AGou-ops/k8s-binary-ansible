@@ -1,0 +1,51 @@
+---
+- name: Create registry directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0777'
+    force: yes
+  loop:
+    - /etc/docker/registry/
+    - /data
+
+- name: Copy registry config dir to user's ansible directory
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /etc/docker/registry/
+    owner: root
+    group: root
+    mode: '0644'
+  loop:
+    - config.yml
+    - registry.local.crt
+    - registry.local.key
+    - htpasswd
+
+- block:
+  - name: Unarchive registry data
+    ansible.builtin.unarchive:
+      src: local-registry-data.tar.gz
+      dest: /data
+      owner: root
+      group: root
+      mode: '0755'
+      remote_src: no
+
+  - name: Unarchive registry docker image tarball
+    ansible.builtin.unarchive:
+      src: registry.tar.gz
+      dest: /tmp
+      owner: root
+      group: root
+      mode: '0755'
+      remote_src: no
+
+  - name: Start registry
+    ansible.builtin.shell:
+      cmd: |
+        nerdctl -n k8s.io load -i /tmp/registry.tar  &>/dev/null
+        nerdctl -n k8s.io stop local-registry &>/dev/null
+        nerdctl -n k8s.io rm local-registry -f &>/dev/null
+        nerdctl -n k8s.io run -d --restart always --name local-registry --hostname registry --network host  -v /data/local-registry/data:/var/lib/registry -v /etc/docker/registry:/etc/docker/registry docker.io/library/registry:2.8.3
+  when: inventory_hostname == groups['master'][0]

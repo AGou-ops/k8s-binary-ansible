@@ -1,0 +1,43 @@
+---
+- name: Replace metallb chart image registry
+# TODO: use template instead.
+  shell: |
+    helm uninstall metallb -n metallb-system || echo
+    cd {{ k8s_manifests_dir }}/charts/metallb
+    sed -i 's/quay.io/registry.local:5000/g' values.yaml
+    sed -i 's/gcr.io/registry.local:5000/g' values.yaml
+  delegate_to: "{{ groups['master'][0] }}"
+  run_once: true
+  tags: metallb
+
+- name: Helm install metallb
+  ansible.builtin.command:
+    cmd: >
+      helm install metallb -n metallb-system --create-namespace .
+    chdir: "{{ k8s_manifests_dir }}/charts/metallb"
+  delegate_to: "{{ groups['master'][0] }}"
+  run_once: true
+  tags: metallb
+
+- name: Template sample l2 config
+  template:
+    src: metallb-l2-sample.yaml.j2
+    dest: "{{ k8s_manifests_dir }}/metallb-l2-sample.yaml"
+    owner: kube
+    group: kube
+    mode: 0755
+  delegate_to: "{{ groups['master'][0] }}"
+  run_once: true
+  tags: metallb
+
+- name: Apply l2 sample manifest
+  ansible.builtin.command:
+    cmd: >
+      kubectl apply -f metallb-l2-sample.yaml
+    chdir: "{{ k8s_manifests_dir }}"
+  delegate_to: "{{ groups['master'][0] }}"
+  retries: 50
+  delay: 15
+  register: apply_result
+  until: apply_result.rc == 0
+  tags: metallb

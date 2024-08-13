@@ -1,36 +1,37 @@
 ---
-- name: "Install dependency"
-  package:
-    name:
-      - libnetfilter_cthelper
-      - libnetfilter_cttimeout
-      - libnetfilter_queue
-      - conntrack-tools
-      - ipvsadm
-      - ipset
-      - socat
-    state: present
-  when:
-    - ansible_os_family in ['RedHat', 'AlmaLinux', 'Rocky']
-  tags: worker_app
+# TODO: fix unknown package manager
+# - name: "Install dependency"
+#   package:
+#     name:
+#       - libnetfilter_cthelper
+#       - libnetfilter_cttimeout
+#       - libnetfilter_queue
+#       - conntrack-tools
+#       - ipvsadm
+#       - ipset
+#       - socat
+#     state: present
+#   when:
+#     - ansible_os_family in ['RedHat', 'AlmaLinux', 'Rocky']
+#   tags: worker_app
+#
+# - name: "Install dependency"
+#   package:
+#     name:
+#       - libnetfilter-cthelper0
+#       - libnetfilter-cttimeout1
+#       - libnetfilter-queue1
+#       - libnetfilter-conntrack3
+#       - conntrack
+#       - ipvsadm
+#       - ipset
+#       - socat
+#     state: present
+#   when:
+#     - ansible_os_family in ["Debian"]
+#   tags: worker_app
 
-- name: "Install dependency"
-  package:
-    name:
-      - libnetfilter-cthelper0
-      - libnetfilter-cttimeout1
-      - libnetfilter-queue1
-      - libnetfilter-conntrack3
-      - conntrack
-      - ipvsadm
-      - ipset
-      - socat
-    state: present
-  when:
-    - ansible_os_family in ["Debian"]
-  tags: worker_app
-
-- name: "Enabled modlue"
+- name: "Enabled module"
   modprobe:
     name: "{{ item.line }}"
     state: present
@@ -51,7 +52,7 @@
     - {line: 'br_netfilter' }
   tags: worker_mod
 
-- name: "Enabled conntrack modlue < 4.19.0"
+- name: "Enabled conntrack module < 4.19.0"
   modprobe:
     name: "nf_conntrack_ipv4"
     state: present
@@ -59,7 +60,7 @@
         ansible_kernel.split('-')[0] is version('4.19.0', '<')
   tags: worker_mod
 
-- name: "Enabled conntrack modlue > 4.19.0"
+- name: "Enabled conntrack module > 4.19.0"
   modprobe:
     name: "nf_conntrack"
     state: present
@@ -184,64 +185,68 @@
     - {src: "kube-proxy.service.j2",dest: "/usr/lib/systemd/system/kube-proxy.service" }
   tags: dis_worker_systemd
 
-- name: "Check if bootstrap-token exists"
-  shell: kubectl -n kube-system get secret bootstrap-token-{{ token_id.stdout }}
-  ignore_errors: yes
-  delegate_to: "{{ groups['master'][0] }}"
-  run_once: true
-  register: bootstrap_token_ready
-  tags: bootstrap
+# - name: "Check if bootstrap-token exists"
+#   shell: kubectl -n kube-system get secret bootstrap-token-{{ token_id.stdout }}
+#   ignore_errors: yes
+#   delegate_to: "{{ groups['master'][0] }}"
+#   run_once: true
+#   register: bootstrap_token_ready
+#   tags: bootstrap
 
 - name: "Create bootstrap-token secret"
-  when: bootstrap_token_ready.rc != 0
+  # when: bootstrap_token_ready.rc != 0
   shell: kubectl -n kube-system create secret generic bootstrap-token-{{ token_id.stdout }} --type 'bootstrap.kubernetes.io/token' --from-literal description="cluster bootstrap token" --from-literal token-id={{ token_id.stdout }} --from-literal token-secret={{ token_secret.stdout }} --from-literal usage-bootstrap-authentication=true --from-literal usage-bootstrap-signing=true
   delegate_to: "{{ groups['master'][0] }}"
   run_once: true
+  ignore_errors: yes
   tags: bootstrap
 
-- name: "Check if clusterrolebinding kubelet-bootstrap exists"
-  shell: kubectl get clusterrolebinding kubelet-bootstrap
-  ignore_errors: yes
-  delegate_to: "{{ groups['master'][0] }}"
-  run_once: true
-  register: kubelet_bootstrap_ready
-  tags: bootstrap
+# - name: "Check if clusterrolebinding kubelet-bootstrap exists"
+#   shell: kubectl get clusterrolebinding kubelet-bootstrap
+#   ignore_errors: yes
+#   delegate_to: "{{ groups['master'][0] }}"
+#   run_once: true
+#   register: kubelet_bootstrap_ready
+#   tags: bootstrap
 
 - name: "Create clusterrolebinding kubelet-bootstrap"
-  when: kubelet_bootstrap_ready.rc != 0
+  # when: kubelet_bootstrap_ready.rc != 0
   shell: kubectl create clusterrolebinding kubelet-bootstrap --clusterrole=system:node-bootstrapper --group=system:bootstrappers
   delegate_to: "{{ groups['master'][0] }}"
   run_once: true
+  ignore_errors: yes
   tags: bootstrap
 
-- name: "Check if node-autoapprove-bootstrap exists"
-  shell: kubectl get clusterrolebinding node-autoapprove-bootstrap
-  ignore_errors: yes
-  delegate_to: "{{ groups['master'][0] }}"
-  run_once: true
-  register: node_autoapprove_bootstrap_ready
-  tags: bootstrap
+# - name: "Check if node-autoapprove-bootstrap exists"
+#   shell: kubectl get clusterrolebinding node-autoapprove-bootstrap
+#   ignore_errors: yes
+#   delegate_to: "{{ groups['master'][0] }}"
+#   run_once: true
+#   register: node_autoapprove_bootstrap_ready
+  # tags: bootstrap
 
 - name: "Create clusterrolebinding node-autoapprove-bootstrap"
-  when: node_autoapprove_bootstrap_ready.rc != 0
+  # when: node_autoapprove_bootstrap_ready.rc != 0
   shell: kubectl create clusterrolebinding node-autoapprove-bootstrap --clusterrole=system:certificates.k8s.io:certificatesigningrequests:nodeclient --group=system:bootstrappers
   delegate_to: "{{ groups['master'][0] }}"
   run_once: true
+  ignore_errors: yes
   tags: bootstrap
 
-- name: "Check if clusterrolebinding node-autoapprove-certificate-rotation exists"
-  shell: kubectl get clusterrolebinding node-autoapprove-certificate-rotation
-  ignore_errors: yes
-  delegate_to: "{{ groups['master'][0] }}"
-  run_once: true
-  register: node_autoapprove_certificate_rotation_ready
-  tags: bootstrap
+# - name: "Check if clusterrolebinding node-autoapprove-certificate-rotation exists"
+#   shell: kubectl get clusterrolebinding node-autoapprove-certificate-rotation
+#   ignore_errors: yes
+#   delegate_to: "{{ groups['master'][0] }}"
+#   run_once: true
+#   register: node_autoapprove_certificate_rotation_ready
+#   tags: bootstrap
 
 - name: "Create clusterrolebinding node-autoapprove-certificate-rotation"
-  when: node_autoapprove_certificate_rotation_ready.rc != 0
+  # when: node_autoapprove_certificate_rotation_ready.rc != 0
   shell: kubectl create clusterrolebinding node-autoapprove-certificate-rotation --clusterrole=system:certificates.k8s.io:certificatesigningrequests:selfnodeclient --group=system:nodes
   delegate_to: "{{ groups['master'][0] }}"
   run_once: true
+  ignore_errors: yes
   tags: bootstrap
 
 - name: "Restart kubelet"

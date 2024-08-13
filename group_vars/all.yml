@@ -1,7 +1,8 @@
 # Download offline package
 download:
   # 离线包保存目录，节点安装包从该目录拷贝
-  dest: /data/web/mirrors/k8s/
+  dest: /Users/mingday/.ansible/workspace/ansible-deploy-k8s-binary/k8s/binary
+
   # 下载超时时间
   timeout: 60
   # 重试次数
@@ -9,15 +10,28 @@ download:
   # 重试的时间间隔
   retry_stagger: 5
 
-# NTP Settings
-ntp:
-  # 需要自定义NTP服务器时需设置为true
-  manage_config: false
-  servers:
-    - "ntp1.aliyun.com iburst"
-    - "ntp2.aliyun.com iburst"
-    - "ntp3.aliyun.com iburst"
-    - "ntp4.aliyun.com iburst"
+# 基础资源清单文件，以及helm chart存放位置
+k8s_manifests_dir: /etc/kubernetes/manifests
+
+# kubeconfig文件路径
+kubeconfig: /root/.kube/config
+
+# # NTP Settings
+# ntp:
+#   # 需要自定义NTP服务器时需设置为true
+#   manage_config: false
+#   servers:
+#     - "ntp1.aliyun.com iburst"
+#     - "ntp2.aliyun.com iburst"
+#     - "ntp3.aliyun.com iburst"
+#     - "ntp4.aliyun.com iburst"
+
+# 镜像仓库源
+registry:
+  external_registry_enable: false
+  external_registry_url: docker.io
+  local_registry_url: registry.local:5000
+
 
 # Repository 软件源
 repo:
@@ -28,7 +42,7 @@ repo:
 # Kubernetes Cert
 cert:
   # 签发集群整数保存目录，默认签发10年有限期证书
-  dir: /opt/certs
+  dir: /Users/mingday/.ansible/workspace/ansible-deploy-k8s-binary/k8s/certs
   # 签发证书大小
   size: 2048
   # 签发证书的时间
@@ -48,8 +62,8 @@ etcd:
 # 如使用域名，需提前配置解析。不使用域名时，请注释掉
 # 如使用haproxy + keepalived ，并且跟master节点部署在一起时，请修改port以避免端口冲突
 loadbalance:
-  ip: 172.16.90.100
-  port: 6443
+  ip: 10.20.183.88
+  port: 8443
   # domain_name: apiserver.kubeop.com
   # access_ip:
   #   - 172.16.90.100
@@ -57,11 +71,11 @@ loadbalance:
 # https://github.com/kubernetes/kubernetes
 kubernetes:
   # kubernetes 版本
-  version: v1.30.1
+  version: v1.30.4
   # 集群Pod网段
-  pods_subnet: 10.64.0.0/12
+  pods_subnet: 172.18.0.0/16
   # 集群Service网段
-  service_addresses: 192.168.0.0/16
+  service_addresses: 10.64.0.0/16
   # 节点Pod网段掩码大小
   node_prefix: 25
   # 节点最大Pod数量
@@ -90,6 +104,16 @@ critools:
   # cri-tools 版本
   version: v1.30.0
 
+# https://github.com/containerd/nerdctl
+nerdctl:
+  # nerdctl 版本
+  version: v1.7.6
+
+# https://github.com/helm/helm
+helm:
+  # helm 版本
+  version: v3.15.4
+
 # https://github.com/containerd/containerd
 containerd:
   # containerd 版本,建议使用1.6.x版本(1.6.x当前为长期稳定版本)
@@ -109,7 +133,7 @@ containerd:
     address: ""
     grpc_histogram: false
   cri:
-    sandbox_image: "registry.aliyuncs.com/google_containers/pause:3.9"
+    sandbox_image: "registry.local:5000/pause:3.9"
     max_concurrent_downloads: 3
     max_container_log_line_size: -1
   containerd:
@@ -121,14 +145,14 @@ containerd:
     "registry.k8s.io": "https://registry.k8s.io"
 
 # Network Plugin
-network_plugin: calico
+network_plugin: cilium
 # cilium need linux kernel >= 4.9.17
 cilium:
   # https://github.com/cilium/cilium
-  version: v1.15.4
+  version: v1.16.1
   # {{cilium.registry}}/operator-generic:{{cilium.version}}
   # {{cilium.registry}}/cilium:{{cilium.version}}
-  registry: m.daocloud.io/docker.io/cilium
+  registry: registry.local:5000/cilium
   # "disabled" or "vxlan" or "geneve"
   network_mode: vxlan
 
@@ -138,7 +162,7 @@ flannel:
   plugin_version: v1.4.1-flannel1
   # {{flannel.registry}}/flannel-cni-plugin:{{flannel.plugin_version}}
   # {{flannel.registry}}/flannel:{{flannel.version}}
-  registry: m.daocloud.io/docker.io/flannel
+  registry: registry.local:5000/flannel
   # "vxlan" or "host-gw"
   network_mode: vxlan
   # 运行参数
@@ -156,19 +180,19 @@ calico:
   # {{calico.registry}}/kube-controllers:{{calico.version}}
   # {{calico.registry}}/node:{{calico.version}}
   # {{calico.registry}}/cni:{{calico.version}}
-  registry: m.daocloud.io/docker.io/calico
+  registry: registry.local:5000/calico
   # "ipip" or "bgp" or "mix"
   network_mode: ipip
   # mtu 默认为0，表示自动自动检测
   mtu: 0
   # 可指定网卡interface=eth.*或使用can-reach=网关
-  ip_autodetection_method: interface=eth0
+  ip_autodetection_method: interface=ens192
 
 kuberouter:
   # https://github.com/cloudnativelabs/kube-router
   version: v1.6.1
   # {{kube-router.registry}}/kube-router
-  registry: m.daocloud.io/docker.io/cloudnativelabs
+  registry: registry.local:5000/cloudnativelabs
   # Setups node CNI to allow hairpin mode, requires node reboots, see
   # https://github.com/cloudnativelabs/kube-router/blob/master/docs/user-guide.md#hairpin-mode
   # 即让Pod可以通过Service访问自己
@@ -184,25 +208,37 @@ kuberouter:
 coredns:
   version: 1.11.1
   # {{coredns.registry}}/coredns:{{coredns.version}}
-  registry: m.daocloud.io/docker.io/coredns
+  registry: registry.local:5000/coredns
 nodelocaldns:
   enabled: true
   version: 1.23.0
   # {{nodelocaldns.registry}}/k8s-dns-node-cache:{{nodelocaldns.version}}
-  registry: m.daocloud.io/registry.k8s.io/dns
+  registry: registry.local:5000/dns
   ip: 169.254.20.10
 metrics_server:
   enabled: true
   version: v0.7.1
   # {{metrics_server.registry}}/metrics-server:{{metrics_server.version}}
-  registry: m.daocloud.io/registry.k8s.io/metrics-server
+  registry: registry.local:5000/metrics-server
 npd:
   enabled: false
   version: v0.8.18
   # {{npd.registry}}/node-problem-detector:{{npd.version}}
-  registry: m.daocloud.io/registry.k8s.io/node-problem-detector
+  registry: registry.local:5000/node-problem-detector
 nvidia_device_plugin:
   enabled: false
   version: v0.15.0
   # {{nvidia_device_plugin.registry}}/k8s-device-plugin:{{nvidia_device_plugin.version}}
   registry: nvcr.io/nvidia
+
+ingress_nginx:
+  enabled: true
+  version: x.x.x
+metallb:
+  enabled: true
+  version: x.x.x
+  l2_addr_range: 10.20.183.160-10.20.183.180
+
+prometheus_stack:
+  enabled: true
+  version: x.x.x

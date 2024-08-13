@@ -11,6 +11,8 @@
     - critools/{{ critools.version }}
     - containerd/v{{ containerd.version }}
     - calico/{{ calico.version }}
+    - nerdctl/{{ nerdctl.version }}
+    - helm/{{ helm.version }}
   tags: download_dir
 
 - name: "Download etcd"
@@ -110,3 +112,30 @@
   retries: "{{ download.retries }}"
   delay: "{{ download.retry_stagger | default(5) }}"
   tags: download_calicoctl
+
+- name: "Download nerdctl"
+  get_url:
+    url: "{{ nerdctl_download_url }}/{{ nerdctl.version }}/nerdctl-{{ nerdctl.version.replace('v', '') }}-linux-amd64.tar.gz"
+    dest: "{{ download.dest }}/nerdctl/{{ nerdctl.version }}"
+    timeout: "{{ download.timeout }}"
+  register: get_url_result
+  until: "'OK' in get_url_result.msg or
+      'file already exists' in get_url_result.msg or
+      get_url_result.status_code | default() == 304"
+  retries: "{{ download.retries }}"
+  delay: "{{ download.retry_stagger | default(5) }}"
+  tags: download_nerdctl
+
+- name: "Download helm"
+  get_url:
+    # https://get.helm.sh/helm-v3.15.4-linux-amd64.tar.gz
+    url: "{{ helm_download_url }}/helm-{{ helm.version }}-linux-amd64.tar.gz"
+    dest: "{{ download.dest }}/helm/{{ helm.version }}"
+    timeout: "{{ download.timeout }}"
+  register: get_url_result
+  until: "'OK' in get_url_result.msg or
+      'file already exists' in get_url_result.msg or
+      get_url_result.status_code | default() == 304"
+  retries: "{{ download.retries }}"
+  delay: "{{ download.retry_stagger | default(5) }}"
+  tags: download_helm

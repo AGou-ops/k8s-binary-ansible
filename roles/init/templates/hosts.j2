@@ -1,0 +1,12 @@
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+
+{{ registry_server_ip }}            {{ registry_server.split(':')[0] }}
+
+
+{% for host in groups['master'] %}
+{{ hostvars[host]['inventory_hostname'] }}              {{ hostvars[host]['hostname'] }}
+{% endfor %}
+{% for host in groups['worker'] %}
+{{ hostvars[host]['inventory_hostname'] }}              {{ hostvars[host]['hostname'] }}
+{% endfor %}

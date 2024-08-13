@@ -1,0 +1,20 @@
+---
+- name: Replace prometheus-stack chart image registry
+# TODO: use template instead.
+  shell: |
+    helm uninstall prometheus-stack -n prometheus-stack || echo
+    cd {{ k8s_manifests_dir }}/charts/kube-prometheus-stack
+    find . -name "values.yaml" -print0 | xargs -0 sed -i -e 's/docker.io/registry.local:5000/g' -e 's/quay.io/registry.local:5000/g' -e 's/registry.k8s.io/registry.local:5000/g'
+  delegate_to: "{{ groups['master'][0] }}"
+  run_once: true
+  tags: prometheus-stack
+
+- name: Helm install prometheus-stack
+  ansible.builtin.command:
+    cmd: >
+      helm install prometheus-stack -n prometheus-stack --create-namespace .
+    chdir: "{{ k8s_manifests_dir }}/charts/kube-prometheus-stack"
+  delegate_to: "{{ groups['master'][0] }}"
+  run_once: true
+  ignore_errors: true
+  tags: prometheus-stack

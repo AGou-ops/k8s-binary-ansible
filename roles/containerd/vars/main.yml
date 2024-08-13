@@ -1,0 +1,12 @@
+---
+registry_server: "{% if registry.external_registry_enable == 'true' -%}
+                  {{ registry.external_registry_url }}
+                  {%- else -%}
+                  {{ registry.local_registry_url }}
+                  {%- endif %}"
+
+registry_server_ip: "{% if registry.external_registry_enable == 'true' -%}
+                     127.0.0.1
+                     {%- else -%}
+                     {{ groups['master'][0] }}
+                     {%- endif %}"

@@ -1,0 +1,40 @@
+---
+- name: "Create haproxy-keepalived config dir"
+  ansible.builtin.file:
+    path: "/etc/kubernetes/haproxy-keepalived"
+    state: directory
+    mode: '0777'
+    force: yes
+
+- name: "Unarchive haproxy-keepalived tarball to /tmp"
+  ansible.builtin.unarchive:
+    src: haproxy-keepalived.tar.gz
+    dest: /tmp
+    owner: root
+    group: root
+    mode: '0755'
+    remote_src: no
+
+- name: "Generate haproxy.cfg"
+  template:
+    src: "haproxy.cfg.j2"
+    dest: "/etc/kubernetes/haproxy-keepalived/haproxy.cfg"
+
+- name: "Generate keepalived.conf"
+  template:
+    src: "keepalived.conf.j2"
+    dest: "/etc/kubernetes/haproxy-keepalived/keepalived.conf"
+
+- name: "Generate check_haproxy.sh"
+  template:
+    src: "check_haproxy.sh.j2"
+    dest: "/etc/kubernetes/haproxy-keepalived/check_haproxy.sh"
+    mode: 0777
+
+- name: "Load haproxy-keepalived.tar"
+  shell: |
+    nerdctl -n k8s.io load -i /tmp/haproxy-keepalived.tar
+
+- name: "Start haproxy-keepalived container"
+  shell: |
+    nerdctl -n k8s.io run -d --restart always --name haproxy-keepalived --network host --cap-add NET_ADMIN -v /etc/kubernetes/haproxy-keepalived/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg -v /etc/kubernetes/haproxy-keepalived/keepalived.conf:/etc/keepalived/keepalived.conf -v /etc/kubernetes/haproxy-keepalived/check_haproxy.sh:/etc/keepalived/check_haproxy.sh instantlinux/haproxy-keepalived:3.0.2-alpine-2.2.8-r0

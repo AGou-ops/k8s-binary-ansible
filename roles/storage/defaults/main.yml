@@ -1,0 +1,52 @@
+---
+# [local-path-provisioner]
+local_path_provisioner_name: local-path-provisioner
+local_path_provisioner_namespace: local-path-provisioner
+local_path_provisioner_image_repository: "{{ registry_server }}/rancher/local-path-provisioner"
+local_path_provisioner_helper_image_repository: "{{ registry_server }}/busybox"
+
+# [nfs-provisioner]
+# nfs_provisioner_name: nfs-provisioner
+# nfs_provisioner_namespace: nfs-provisioner
+# nfs_provisioner_image_repository: "{{ registry_server }}/sig-storage/nfs-subdir-external-provisioner"
+# nfs_provisioner_nfs_server: "{{ groups['master'][0] }}"
+
+# [kubernetes-dashboard]
+kubernetes_dashboard_name: kubernetes-dashboard
+kubernetes_dashboard_namespace: kubernetes-dashboard
+kubernetes_dashboard_image_repository: "{{ registry_server }}/kubernetesui/dashboard"
+kubernetes_dashboard_metrics_scraper_image_repository: "{{ registry_server }}/kubernetesui/metrics-scraper"
+kubernetes_dashboard_metrics_server_image_repository: "{{ registry_server }}/metrics-server/metrics-server"
+
+# [ingress-nginx]
+ingress_nginx_name: ingress-nginx
+ingress_nginx_namespace: ingress-nginx
+
+# [metallb]
+metallb_name: metallb
+metallb_namespcae: metallb-system
+
+# [kube-prometheus]
+kube_prometheus_name: kube-prometheus
+kube_prometheus_namespace: monitoring
+
+# [grafana]
+grafana_name: grafana
+grafana_namespace: monitoring
+
+# [minio]
+minio_name: minio
+minio_namespace: minio
+
+# [portainer]
+portainer_name: portainer
+portainer_namespace: portainer
+portainer_image_registry: "{{ registry_server }}/portainer/portainer-ce"
+
+# [loki]
+loki_name: loki
+loki_namespace: monitoring
+
+# [promtail]
+promtail_name: promtail
+promtail_namespace: monitoring

@@ -1,0 +1,33 @@
+version: 0.1
+log:
+  accesslog:
+    disabled: true
+  fields:
+    service: registry
+  level: error
+storage:
+  cache:
+    blobdescriptor: inmemory
+  filesystem:
+    rootdirectory: /var/lib/registry
+  delete:
+    enabled: true
+http:
+  addr: :5000
+  # host: https://registry.local
+  headers:
+    X-Content-Type-Options: [nosniff]
+  http2:
+    disabled: false
+  tls:
+    certificate: /etc/docker/registry/registry.local.crt
+    key: /etc/docker/registry/registry.local.key
+# auth:
+#   htpasswd:
+#     realm: basic-realm
+#     path: /etc/docker/registry/htpasswd
+health:
+  storagedriver:
+    enabled: true
+    interval: 10s
+threshold: 3

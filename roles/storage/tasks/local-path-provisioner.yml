@@ -1,0 +1,42 @@
+---
+# - name: Deploy local-path-provisioner from local file
+#   kubernetes.core.helm:
+#     kubeconfig: "{{ kubeconfig }}"
+#     state: present
+#     name: local-path-provisioner
+#     namespace: local-path-provisioner
+#     create_namespace: true
+#     chart_ref: "{{ role_path }}/files/charts/local-path-provisioner.tgz"
+#     values_files:
+#       - "{{ role_path }}/templates/localpath-values.yaml"
+#     set_values:
+#       - value: image.repository=registry.local:5000/rancher/local-path-provisioner
+#         value_type: string
+#       - value: helperImage.repository=registry.local:5000/busybox
+#         value_type: string
+#   delegate_to: "{{ groups['master'][0] }}"
+
+- name: Create kubernetes manifests charts dir
+  file:
+    path: "{{ k8s_manifests_dir }}/charts"
+    owner: root
+    group: root
+    mode: 0755
+    state: directory
+  delegate_to: "{{ groups['master'][0] }}"
+
+- name: Unarchive local-path-provisioner helm chart tarball to k8s_manifests_dir
+  unarchive:
+    src: "charts/local-path-provisioner.tgz"
+    dest: "{{ k8s_manifests_dir }}/charts"
+    remote_src: no
+  delegate_to: "{{ groups['master'][0] }}"
+
+- name: Helm install local-path-provisioner
+  ansible.builtin.command:
+    cmd: >
+      helm install local-path-provisioner -n local-path-provisioner --create-namespace .
+    chdir: "{{ k8s_manifests_dir }}/charts/local-path-provisioner"
+  delegate_to: "{{ groups['master'][0] }}"
+  run_once: true
+  tags: local-path-provisioner
