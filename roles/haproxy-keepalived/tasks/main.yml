@@ -25,11 +25,11 @@
     src: "keepalived.conf.j2"
     dest: "/etc/kubernetes/haproxy-keepalived/keepalived.conf"
 
-- name: "Generate check_haproxy.sh"
-  template:
-    src: "check_haproxy.sh.j2"
-    dest: "/etc/kubernetes/haproxy-keepalived/check_haproxy.sh"
-    mode: 0777
+# - name: "Generate check_haproxy.sh"
+#   template:
+#     src: "check_haproxy.sh.j2"
+#     dest: "/etc/kubernetes/haproxy-keepalived/check_haproxy.sh"
+#     mode: 0777
 
 - name: "Load haproxy-keepalived.tar"
   shell: |

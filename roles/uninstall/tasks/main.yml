@@ -156,6 +156,8 @@
     state: absent
   with_items:
     - /usr/lib/systemd/system/containerd.service
+    - /etc/systemd/system/containerd.service
+    - /usr/local/lib/systemd/system/containerd.service
     - /etc/containerd/config.toml
     - /etc/crictl.yaml
     - /usr/local/bin/crictl

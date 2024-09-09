@@ -31,6 +31,17 @@
     dest: "{{ k8s_manifests_dir }}/charts"
     remote_src: no
   delegate_to: "{{ groups['master'][0] }}"
+  tags: local-path-provisioner
+
+- name: Replace local-path-provisioner chart image registry
+# TODO: use template instead.
+  shell: |
+    helm uninstall local-path-provisioner -n local-path-provisioner || echo
+    cd {{ k8s_manifests_dir }}/charts/local-path-provisioner
+    sed -i 's/repository: /repository: registry.local:5000\//g' values.yaml
+  delegate_to: "{{ groups['master'][0] }}"
+  run_once: true
+  tags: local-path-provisioner
 
 - name: Helm install local-path-provisioner
   ansible.builtin.command:

@@ -2,14 +2,6 @@ global_defs {
    router_id HA_{{ type }}
 }
 
-# vrrp_script Checkhaproxy {
-#     script "/etc/kubernetes/haproxy-keepalived/check_haproxy.sh"
-#     interval 3
-#     timeout 9
-#     fall 2
-#     rise 2
-#  }
-
 vrrp_instance VI_1 {
     state {{ type }}
     interface {{ ansible_default_ipv4.interface }}

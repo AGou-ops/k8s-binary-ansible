@@ -36,7 +36,7 @@
       kubectl apply -f metallb-l2-sample.yaml
     chdir: "{{ k8s_manifests_dir }}"
   delegate_to: "{{ groups['master'][0] }}"
-  retries: 50
+  retries: 20
   delay: 15
   register: apply_result
   until: apply_result.rc == 0

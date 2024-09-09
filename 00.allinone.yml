@@ -42,7 +42,7 @@
 
 # 使用nerdctl单容器模式实现
 - name: "Set Haproxy + Keepalived via nerdctl"
-  hosts: master
+  hosts: haproxy
   roles:
     - role: haproxy-keepalived
       tags: haproxy-keepalived
