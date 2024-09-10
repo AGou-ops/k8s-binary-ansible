@@ -117,11 +117,10 @@
     - dis_master_certs
     - dis_certs
 
-  # TODO: fix remote install
 - name: "Get token-id"
   shell: "cat {{ cert.dir }}/token | grep -v '^#' | awk -F '.' '{print $1}'"
   register: token_id
-  connection: local
+  delegate_to: localhost
   tags:
     - dis_kubectl_kubeconfig
     - dis_master_kubeconfig
@@ -242,7 +241,7 @@
     client_key: "{{ cert.dir }}/{{ ansible_default_ipv4.address }}/admin.key"
   register: apiserver
   failed_when: "'ok' not in apiserver.content"
-  connection: local
+  delegate_to: localhost
   tags: healthcheck
 
 - name: "Kube-controller-manager health check"
@@ -252,7 +251,7 @@
     validate_certs: no
   register: controller
   failed_when: "'ok' not in controller.content"
-  connection: local
+  delegate_to: localhost
   tags: healthcheck
 
 - name: "Kube-scheduler health check"
@@ -262,5 +261,5 @@
     validate_certs: no
   register: scheduler
   failed_when: "'ok' not in scheduler.content"
-  connection: local
+  delegate_to: localhost
   tags: healthcheck

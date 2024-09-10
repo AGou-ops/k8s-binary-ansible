@@ -234,6 +234,11 @@ nvidia_device_plugin:
 ingress_nginx:
   enabled: true
   version: x.x.x
+
+cert_manager:
+  enabled: true
+  version: x.x.x
+
 metallb:
   enabled: true
   version: x.x.x

@@ -46,6 +46,11 @@
   tags:
     - ingress-nginx
 
+- import_tasks: cert-manager.yml
+  when: cert_manager.enabled == true
+  tags:
+    - cert-manager
+
 - import_tasks: metallb.yml
   when: metallb.enabled == true
   tags:

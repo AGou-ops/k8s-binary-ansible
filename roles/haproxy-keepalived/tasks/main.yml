@@ -37,4 +37,4 @@
 
 - name: "Start haproxy-keepalived container"
   shell: |
-    nerdctl -n k8s.io run -d --restart always --name haproxy-keepalived --network host --cap-add NET_ADMIN -v /etc/kubernetes/haproxy-keepalived/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg -v /etc/kubernetes/haproxy-keepalived/keepalived.conf:/etc/keepalived/keepalived.conf -v /etc/kubernetes/haproxy-keepalived/check_haproxy.sh:/etc/keepalived/check_haproxy.sh instantlinux/haproxy-keepalived:3.0.2-alpine-2.2.8-r0
+    nerdctl -n k8s.io run -d --restart always --name haproxy-keepalived --network host --cap-add NET_ADMIN -v /etc/kubernetes/haproxy-keepalived/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg -v /etc/kubernetes/haproxy-keepalived/keepalived.conf:/etc/keepalived/keepalived.conf instantlinux/haproxy-keepalived:3.0.2-alpine-2.2.8-r0

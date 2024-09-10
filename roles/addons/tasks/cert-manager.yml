@@ -1,0 +1,19 @@
+---
+- name: Replace cert-manager chart image registry
+# TODO: use template instead.
+  shell: |
+    helm uninstall cert-manager -n cert-manager || echo
+    cd {{ k8s_manifests_dir }}/charts/cert-manager
+    sed -i 's/quay.io/registry.local:5000/g' values.yaml
+  delegate_to: "{{ groups['master'][0] }}"
+  run_once: true
+  tags: cert-manager
+
+- name: Helm install cert-manager
+  ansible.builtin.command:
+    cmd: >
+      helm install cert-manager -n cert-manager --create-namespace --set crds.enabled=true .
+    chdir: "{{ k8s_manifests_dir }}/charts/cert-manager"
+  delegate_to: "{{ groups['master'][0] }}"
+  run_once: true
+  tags: cert-manager
