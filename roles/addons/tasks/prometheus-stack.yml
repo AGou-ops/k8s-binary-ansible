@@ -18,3 +18,18 @@
   run_once: true
   ignore_errors: true
   tags: prometheus-stack
+
+- block:
+  - name: Copy grafana-dashboards-kubernetes to master[0]
+    copy:
+      src: grafana-dashboards-kubernetes
+      dest: "{{ k8s_manifests_dir }}"
+  - name: Install additional grafana kubernetes dashboards
+    ansible.builtin.command:
+      cmd: >
+         kubectl apply -k . -n prometheus-stack
+      chdir: "{{ k8s_manifests_dir }}/grafana-dashboards-kubernetes"
+  delegate_to: "{{ groups['master'][0] }}"
+  ignore_errors: true
+  run_once: true
+  tags: prometheus-stack
