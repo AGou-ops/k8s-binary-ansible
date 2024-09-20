@@ -1,7 +1,6 @@
 ---
 - name: "Download Offline Package"
   hosts: localhost
-  delegate_to: localhost
   roles:
     - role: download
       tags: download
