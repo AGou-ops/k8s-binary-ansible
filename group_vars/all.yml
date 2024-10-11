@@ -92,32 +92,32 @@ kubernetes:
 # https://github.com/opencontainers/runc
 runc:
   # runc 版本
-  version: v1.1.12
+  version: v1.1.15
 
 # https://github.com/containernetworking/plugins
 cniplugins:
   # cni-plugins 版本
-  version: v1.4.1
+  version: v1.5.1
 
 # https://github.com/kubernetes-sigs/cri-tools
 critools:
   # cri-tools 版本
-  version: v1.30.0
+  version: v1.31.0
 
 # https://github.com/containerd/nerdctl
 nerdctl:
   # nerdctl 版本
-  version: v1.7.6
+  version: v1.7.7
 
 # https://github.com/helm/helm
 helm:
   # helm 版本
-  version: v3.16.1
+  version: v3.16.2
 
 # https://github.com/containerd/containerd
 containerd:
   # containerd 版本,建议使用1.6.x版本(1.6.x当前为长期稳定版本)
-  version: 1.6.33
+  version: 1.7.22
   # containerd 持久化数据目录，如使用多个目录映射同一块数据盘的方式，请勿修改默认目录
   root: "/var/lib/containerd"
   # containerd 临时数据目录
