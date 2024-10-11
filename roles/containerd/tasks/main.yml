@@ -83,6 +83,14 @@
     remote_src: no
   tags: install_cni
 
+- name: Fix cilium mount-cgroup fails to copy file
+  file:
+    path: "/opt/cni/bin"
+    owner: root
+    group: root
+    mode: '0755'
+  tags: cni_config
+
 - name: Install containerd
   unarchive:
     src: "{{ download.dest }}/containerd/v{{ containerd.version }}/containerd-{{ containerd.version }}-linux-amd64.tar.gz"
