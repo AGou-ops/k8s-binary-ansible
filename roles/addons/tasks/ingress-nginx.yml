@@ -11,9 +11,10 @@
   tags: ingress-nginx
 
 - name: Helm install ingress-nginx
-  ansible.builtin.command:
-    cmd: >
-      helm install ingress-nginx -n ingress-nginx --create-namespace .
+# backend apply.
+  ansible.builtin.shell: |
+      nohup helm install ingress-nginx -n ingress-nginx --create-namespace . &
+  args:
     chdir: "{{ k8s_manifests_dir }}/charts/ingress-nginx"
   delegate_to: "{{ groups['master'][0] }}"
   run_once: true
