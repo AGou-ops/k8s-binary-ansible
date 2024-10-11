@@ -157,8 +157,8 @@
     state: absent
   with_items:
     - /usr/lib/systemd/system/containerd.service
-    - /etc/systemd/system/containerd.service
     - /usr/local/lib/systemd/system/containerd.service
+    - /etc/systemd/system/containerd.service
     - /etc/containerd/config.toml
     - /etc/crictl.yaml
     - /usr/local/bin/crictl
@@ -288,7 +288,7 @@
     - "{{ ansible_env.HOME | default('/root') }}/.kube"
     - /var/log/kubernetes
     - /etc/cni
-    - /opt/cni
+    - /opt/cni/bin
     - /run/flannel
     - /etc/flannel
     - /var/log/pods/
@@ -365,6 +365,7 @@
     - /usr/bin/kubectl
     - /usr/bin/nerdctl
     - /usr/bin/helm
+    - /usr/local/bin/helm
   ignore_errors: true
   tags:
     - files
