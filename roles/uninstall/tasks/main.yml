@@ -342,6 +342,8 @@
         - "br-"
         - "cilium"
         - "nodelocaldns"
+        - "cni0"
+        - "flannel.1"
 
   - name: Remove network interfaces
     shell: |
