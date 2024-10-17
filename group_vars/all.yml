@@ -145,7 +145,7 @@ containerd:
     "registry.k8s.io": "https://registry.k8s.io"
 
 # Network Plugin
-network_plugin: cilium
+network_plugin: flannel
 # cilium need linux kernel >= 4.9.17
 cilium:
   # https://github.com/cilium/cilium
@@ -158,8 +158,8 @@ cilium:
 
 flannel:
   # https://github.com/flannel-io/flannel
-  version: v0.25.1
-  plugin_version: v1.4.1-flannel1
+  version: v0.25.7
+  plugin_version: v1.5.1-flannel3
   # {{flannel.registry}}/flannel-cni-plugin:{{flannel.plugin_version}}
   # {{flannel.registry}}/flannel:{{flannel.version}}
   registry: registry.local:5000/flannel
