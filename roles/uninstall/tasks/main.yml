@@ -4,6 +4,7 @@
     helm list --all --all-namespaces | awk 'NR > 1 { print "--namespace "$2, $1}' | xargs --max-lines=1 helm delete
   ignore_errors: yes
   delegate_to: "{{ groups['master'][0] }}"
+  when: inventory_hostname in groups['master']
   run_once: true
   tags:
     - uninstall_charts
