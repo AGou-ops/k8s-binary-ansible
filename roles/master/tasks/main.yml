@@ -125,13 +125,27 @@
     - dis_kubectl_kubeconfig
     - dis_master_kubeconfig
 
-- name: "Distribution kubectl kubeconfig"
-  template:
-    src: "admin.kubeconfig.j2"
-    owner: kube
-    group: kube
-    mode: 0600
-    dest: "~/.kube/config"
+- block:
+  - name: "Slurp certificates and keys from remote server"
+    slurp:
+      src: "{{ item.path }}"
+    loop:
+      - { name: 'ca_cert', path: '/etc/kubernetes/pki/ca.pem' }
+      - { name: 'client_cert', path: '/etc/kubernetes/pki/admin.pem' }
+      - { name: 'client_key', path: '/etc/kubernetes/pki/admin.key' }
+    register: slurped_files
+
+  - name: "Distribution kubectl kubeconfig"
+    template:
+      src: admin.kubeconfig.j2
+      owner: kube
+      group: kube
+      mode: 0600
+      dest: "~/.kube/config"
+    vars:
+      ca_data: "{{ slurped_files.results | selectattr('item.name', 'equalto', 'ca_cert') | map(attribute='content') | first }}"
+      client_cert_data: "{{ slurped_files.results | selectattr('item.name', 'equalto', 'client_cert') | map(attribute='content') | first }}"
+      client_key_data: "{{ slurped_files.results | selectattr('item.name', 'equalto', 'client_key') | map(attribute='content') | first }}"
   tags:
     - dis_kubectl_kubeconfig
     - dis_master_kubeconfig

@@ -29,10 +29,10 @@ registry:
 	ls -lh ./roles/registry/files/local-registry-data.tar.gz
 
 pull-pki:
-	scp -r 10.20.183.80:/etc/kubernetes/pki ~/.kube
+	scp -r 10.20.183.80:/root/.kube/config ~/.kube/config.88
+	kubectl konfig import --save ~/.kube/config.88
 
 vpn: pull-pki
-	kubectx kubernetes-80 || echo
 	kubevpn disconnect 0 || echo
 	kubevpn connect --image registry.local:5000/kubevpn:2.2.17
 
