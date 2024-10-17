@@ -11,7 +11,6 @@
 
 - name: Helm install cert-manager
 # backend apply.
-  ansible.builtin.command:
   ansible.builtin.shell: |
       nohup helm install cert-manager -n cert-manager --create-namespace --set crds.enabled=true . &
   args:

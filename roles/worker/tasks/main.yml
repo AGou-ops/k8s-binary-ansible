@@ -89,7 +89,7 @@
     state: directory
   with_items:
     - {line: '/etc/kubernetes/pki'}
-    - {line: '/etc/kubernetes/manifests'}
+    - {line: '/etc/kubernetes/manifests/staticPods'}
     - {line: "{{ kubernetes.kubelet_dir }}"}
   tags: dir
 
