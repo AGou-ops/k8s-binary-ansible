@@ -24,6 +24,7 @@ registry:
 	ssh 10.20.183.80 "nerdctl -n k8s.io exec local-registry registry garbage-collect -m /etc/docker/registry/config.yml && \
 	cd /data && rm -f local-registry-data.tar.gz || echo ; \
 	tar -cvf - local-registry | pigz -9 > /data/local-registry-data.tar.gz"
+	mv -f ./roles/registry/files/local-registry-data.tar.gz{,.bak}
 	scp 10.20.183.80:/data/local-registry-data.tar.gz ./roles/registry/files/local-registry-data.tar.gz
 	ls -lh ./roles/registry/files/local-registry-data.tar.gz
 

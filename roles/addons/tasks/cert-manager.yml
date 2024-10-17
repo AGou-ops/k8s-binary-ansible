@@ -10,9 +10,11 @@
   tags: cert-manager
 
 - name: Helm install cert-manager
+# backend apply.
   ansible.builtin.command:
-    cmd: >
-      helm install cert-manager -n cert-manager --create-namespace --set crds.enabled=true .
+  ansible.builtin.shell: |
+      nohup helm install cert-manager -n cert-manager --create-namespace --set crds.enabled=true . &
+  args:
     chdir: "{{ k8s_manifests_dir }}/charts/cert-manager"
   delegate_to: "{{ groups['master'][0] }}"
   run_once: true
