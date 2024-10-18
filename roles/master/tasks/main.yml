@@ -222,6 +222,17 @@
     line: "command -v kubectl &> /dev/null && source <(kubectl completion bash)"
     state: present
 
+- block:
+  - name: "Copy kubectl aliases"
+    copy:
+      src: ".kubectl_aliases"
+      dest: "/root/.kubectl_aliases"
+  - name: "Add kubectl aliases"
+    lineinfile:
+      dest: "/etc/profile"
+      line: "command -v kubectl &> /dev/null && source /root/.kubectl_aliases"
+      state: present
+
 - name: "Waiting kube-apiserver starting"
   wait_for:
     host: "{{ ansible_default_ipv4.address }}"
