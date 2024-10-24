@@ -11,7 +11,7 @@ install:
 	ansible-playbook 00.allinone.yml -i inventory --skip-tags=create_master_taint
 
 download:
-	ansible-playbook download.yml
+	ansible-playbook download.yml -vvv
 
 startat:
 	@if [ -z "$(task)" ]; then \
@@ -29,8 +29,8 @@ registry:
 	ls -lh ./roles/registry/files/local-registry-data.tar.gz
 
 pull-pki:
-	scp -r 10.20.183.80:/root/.kube/config ~/.kube/config.88
-	kubectl konfig import --save ~/.kube/config.88
+	scp -r 10.20.183.80:/root/.kube/config ~/.kube/config
+	# kubectl konfig import --save ~/.kube/config.88
 
 vpn: pull-pki
 	kubevpn disconnect 0 || echo

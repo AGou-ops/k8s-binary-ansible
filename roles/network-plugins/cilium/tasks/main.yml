@@ -12,7 +12,7 @@
     helm uninstall cilium -n kube-system || echo
     cd {{ k8s_manifests_dir }}/cilium
     sed -i "s/useDigest: true/useDigest: false/g" values.yaml
-    sed -i 's/repository: "/repository: "registry.local:5000\//g' values.yaml
+    sed -i 's/repository: "/repository: "{{ registry.local_registry_url }}\//g' values.yaml
   delegate_to: "{{ groups['master'][0] }}"
   run_once: true
   tags: cilium

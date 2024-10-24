@@ -10,9 +10,9 @@
 #     values_files:
 #       - "{{ role_path }}/templates/localpath-values.yaml"
 #     set_values:
-#       - value: image.repository=registry.local:5000/rancher/local-path-provisioner
+#       - value: image.repository={{ registry.local_registry_url }}/rancher/local-path-provisioner
 #         value_type: string
-#       - value: helperImage.repository=registry.local:5000/busybox
+#       - value: helperImage.repository={{ registry.local_registry_url }}/busybox
 #         value_type: string
 #   delegate_to: "{{ groups['master'][0] }}"
 
@@ -38,7 +38,7 @@
   shell: |
     helm uninstall local-path-provisioner -n local-path-provisioner || echo
     cd {{ k8s_manifests_dir }}/charts/local-path-provisioner
-    sed -i 's/repository: /repository: registry.local:5000\//g' values.yaml
+    sed -i 's/repository: /repository: {{ registry.local_registry_url }}\//g' values.yaml
   delegate_to: "{{ groups['master'][0] }}"
   run_once: true
   tags: local-path-provisioner

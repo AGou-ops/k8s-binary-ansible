@@ -4,8 +4,8 @@
   shell: |
     helm uninstall metallb -n metallb-system || echo
     cd {{ k8s_manifests_dir }}/charts/metallb
-    sed -i 's/quay.io/registry.local:5000/g' values.yaml
-    sed -i 's/gcr.io/registry.local:5000/g' values.yaml
+    sed -i 's/quay.io/{{ registry.local_registry_url }}/g' values.yaml
+    sed -i 's/gcr.io/{{ registry.local_registry_url }}/g' values.yaml
   delegate_to: "{{ groups['master'][0] }}"
   run_once: true
   tags: metallb
