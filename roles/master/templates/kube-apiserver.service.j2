@@ -11,6 +11,9 @@ ExecStart=/usr/bin/kube-apiserver $KUBE_API_ARGS
 Restart=on-failure
 Type=notify
 LimitNOFILE=65536
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=kube-apiserver
 
 [Install]
 WantedBy=multi-user.target

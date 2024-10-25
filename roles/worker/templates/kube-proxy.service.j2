@@ -25,6 +25,9 @@ User=root
 ExecStart=/usr/bin/kube-proxy --config=/etc/kubernetes/kube-proxy.conf
 Restart=on-failure
 LimitNOFILE=65536
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=kube-proxy
 
 [Install]
 WantedBy=multi-user.target

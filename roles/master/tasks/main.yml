@@ -189,6 +189,53 @@
     - {src: "kube-scheduler.service.j2",dest: "/usr/lib/systemd/system/kube-scheduler.service" }
   tags: dis_master_systemd
 
+- name: "Check rsyslog is existed"
+  shell: systemctl status rsyslog
+  register: rsyslog_result
+  ignore_errors: true
+
+- block:
+  - name: "Create dirs for master services logs"
+    file:
+      path: "{{ item }}"
+      state: directory
+      owner: root
+      group: root
+      mode: '0755'
+    loop:
+      - "/etc/rsyslog.d"
+      - "/var/log/kubernetes/kube-apiserver"
+      - "/var/log/kubernetes/kube-controller-manager"
+      - "/var/log/kubernetes/kube-scheduler"
+
+  - name: "Create log files for master services"
+    file:
+      path: "{{ item }}"
+      state: touch
+      owner: root
+      group: root
+      mode: '0644'
+    loop:
+      - "/var/log/kubernetes/kube-apiserver/kube-apiserver.log"
+      - "/var/log/kubernetes/kube-scheduler/kube-scheduler.log"
+      - "/var/log/kubernetes/kube-controller-manager/kube-controller-manager.log"
+
+  - name: "Setup rsyslog master config"
+    copy:
+      src: "k8s-master-rsyslog.conf"
+      dest: "/etc/rsyslog.d/k8s-master.conf"
+      owner: root
+      group: root
+      mode: 0750
+
+  - name: "Restart rsyslog service"
+    service:
+      name: rsyslog
+      state: restarted
+    when: ansible_service_mgr == "systemd"
+  when: rsyslog_result.rc == 0
+  tags: rsyslog
+
 - name: "Restart kube-apiserver"
   systemd:
     name: kube-apiserver

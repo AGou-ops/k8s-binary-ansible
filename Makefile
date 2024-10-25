@@ -30,6 +30,7 @@ registry:
 
 pull-pki:
 	scp -r 10.20.183.80:/root/.kube/config ~/.kube/config
+	chmod 600 ~/.kube/config
 	# kubectl konfig import --save ~/.kube/config.88
 
 vpn: pull-pki

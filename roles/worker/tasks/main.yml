@@ -185,6 +185,51 @@
     - {src: "kube-proxy.service.j2",dest: "/usr/lib/systemd/system/kube-proxy.service" }
   tags: dis_worker_systemd
 
+- name: "Check rsyslog is existed"
+  shell: systemctl status rsyslog
+  register: rsyslog_result
+  ignore_errors: true
+
+- block:
+  - name: "Create dirs for worker services logs"
+    file:
+      path: "{{ item }}"
+      state: directory
+      owner: root
+      group: root
+      mode: '0755'
+    loop:
+      - "/etc/rsyslog.d"
+      - "/var/log/kubernetes/kubelet"
+      - "/var/log/kubernetes/kube-proxy"
+
+  - name: "Create kubelet.log and kube-proxy.log files"
+    file:
+      path: "{{ item }}"
+      state: touch
+      owner: root
+      group: root
+      mode: '0644'
+    loop:
+      - "/var/log/kubernetes/kubelet/kubelet.log"
+      - "/var/log/kubernetes/kube-proxy/kube-proxy.log"
+
+  - name: "Setup rsyslog worker config"
+    copy:
+      src: "k8s-worker-rsyslog.conf"
+      dest: "/etc/rsyslog.d/k8s-worker.conf"
+      owner: root
+      group: root
+      mode: 0750
+
+  - name: "Restart rsyslog service"
+    service:
+      name: rsyslog
+      state: restarted
+    when: ansible_service_mgr == "systemd"
+  when: rsyslog_result.rc == 0
+  tags: rsyslog
+
 # - name: "Check if bootstrap-token exists"
 #   shell: kubectl -n kube-system get secret bootstrap-token-{{ token_id.stdout }}
 #   ignore_errors: yes

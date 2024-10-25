@@ -10,6 +10,9 @@ User=kube
 ExecStart=/usr/bin/kube-controller-manager $KUBE_CONTROLLER_MANAGER_ARGS
 Restart=on-failure
 LimitNOFILE=65536
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=kube-controller-manager
 
 [Install]
 WantedBy=multi-user.target
