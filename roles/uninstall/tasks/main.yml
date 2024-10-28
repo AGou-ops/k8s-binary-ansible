@@ -53,6 +53,9 @@
     path: "{{ item }}"
     state: absent
   with_items:
+    - /usr/lib/systemd/system/kube-apiserver.service
+    - /usr/lib/systemd/system/kube-controller-manager.service
+    - /usr/lib/systemd/system/kube-scheduler.service
     - /usr/lib/systemd/system/kubelet.service.d/10-kubeadm.conf
     - /usr/lib/systemd/system/kubelet.service
     - /usr/lib/systemd/system/kube-proxy.service
@@ -369,6 +372,9 @@
     - /usr/bin/nerdctl
     - /usr/bin/helm
     - /usr/local/bin/helm
+    - /var/log/kubernetes
+    - /etc/rsyslog.d/k8s-master.conf
+    - /etc/rsyslog.d/k8s-worker.conf
   ignore_errors: true
   tags:
     - files

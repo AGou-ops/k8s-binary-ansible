@@ -1,21 +1,42 @@
 ---
-- name: Replace ingress-nginx chart image registry
-# TODO: use template instead.
+# --- just for debug.
+# shell: |
+#   helm uninstall ingress-nginx -n ingress-nginx || echo
+#   cd {{ k8s_manifests_dir }}/charts/ingress-nginx
+#   sed -i 's/registry.k8s.io/{{ registry.local_registry_url }}/g' values.yaml
+#   sed -i -e '/^\s*digest:/ s/^/#/g' -e '/^\s*digestChroot:/ s/^/#/g' values.yaml
+#
+- name: Uninstall ingress-nginx Helm chart
   shell: |
     helm uninstall ingress-nginx -n ingress-nginx || echo
-    cd {{ k8s_manifests_dir }}/charts/ingress-nginx
-    sed -i 's/registry.k8s.io/{{ registry.local_registry_url }}/g' values.yaml
-    sed -i -e '/^\s*digest:/ s/^/#/g' -e '/^\s*digestChroot:/ s/^/#/g' values.yaml
+  delegate_to: "{{ groups['master'][0] }}"
+  run_once: true
+  tags: ingress-nginx
+
+- name: Replace image registry in ingress-nginx chart values
+  ansible.builtin.replace:
+    path: "{{ k8s_manifests_dir }}/charts/ingress-nginx/values.yaml"
+    regexp: 'registry.k8s.io'
+    replace: "{{ registry.local_registry_url }}"
+  delegate_to: "{{ groups['master'][0] }}"
+  run_once: true
+  tags: ingress-nginx
+
+- name: Comment out 'digest' and 'digestChroot' lines in ingress-nginx values
+  ansible.builtin.lineinfile:
+    path: "{{ k8s_manifests_dir }}/charts/ingress-nginx/values.yaml"
+    regex: '^\s*(digest:|digestChroot:)'
+    state: absent
   delegate_to: "{{ groups['master'][0] }}"
   run_once: true
   tags: ingress-nginx
 
 - name: Helm install ingress-nginx
-# backend apply.
-  ansible.builtin.shell: |
-      nohup helm install ingress-nginx -n ingress-nginx --create-namespace . &
-  args:
+  ansible.builtin.command:
+    cmd: "helm install ingress-nginx -n ingress-nginx --create-namespace ."
     chdir: "{{ k8s_manifests_dir }}/charts/ingress-nginx"
+  async: 300
+  poll: 0
   delegate_to: "{{ groups['master'][0] }}"
   run_once: true
   tags: ingress-nginx

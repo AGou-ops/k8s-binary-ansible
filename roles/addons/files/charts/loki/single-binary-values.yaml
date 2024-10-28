@@ -82,6 +82,23 @@ minio:
     size: 50Gi
     storageClass: "local-path"
 
+memcachedExporter:
+  # -- Whether memcached metrics should be exported
+  enabled: true
+  image:
+    repository: docker.io/prom/memcached-exporter
+    tag: v0.14.2
+    pullPolicy: IfNotPresent
+
+memcached:
+  image:
+    # -- Memcached Docker image repository
+    repository: docker.io/memcached
+    # -- Memcached Docker image tag
+    tag: 1.6.23-alpine
+    # -- Memcached Docker image pull policy
+    pullPolicy: IfNotPresent
+
 sidecar:
   image:
     # -- The Docker registry and image for the k8s sidecar
