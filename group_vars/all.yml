@@ -247,3 +247,7 @@ metallb:
 prometheus_stack:
   enabled: true
   version: x.x.x
+
+grafana_loki:
+  enabled: true
+  version: x.x.x

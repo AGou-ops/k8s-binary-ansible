@@ -17,4 +17,5 @@ certs
 images
 local-registry-data.tar.gz
 local-registry-data.tar.gz.bak
+local-registry-data.tar.gz.bak.*
 ./roles/addons/files/charts.tar.gz

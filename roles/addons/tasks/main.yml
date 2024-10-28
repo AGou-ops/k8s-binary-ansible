@@ -60,3 +60,8 @@
   when: prometheus_stack.enabled == true
   tags:
     - prometheus-stack
+
+- import_tasks: grafana-loki.yml
+  when: grafana_loki.enabled == true
+  tags:
+    - grafana-loki

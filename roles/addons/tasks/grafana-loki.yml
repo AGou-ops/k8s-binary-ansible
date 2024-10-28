@@ -1,0 +1,41 @@
+---
+- name: Replace loki and alloy chart image registry
+# TODO: use template instead.
+# TODO: 优化
+  shell: |
+    helm uninstall loki -n logging || echo
+    cd {{ k8s_manifests_dir }}/charts/loki
+    sed -i 's/docker.io/{{ registry.local_registry_url }}/g' single-binary-values.yaml
+    sed -i 's/quay.io/{{ registry.local_registry_url }}/g' charts/minio/values.yaml
+    sed -i 's/docker.io/{{ registry.local_registry_url }}/g' values.yaml
+    sed -i 's/quay.io/{{ registry.local_registry_url }}/g' values.yaml
+    sed -i 's/ghcr.io/{{ registry.local_registry_url }}/g' values.yaml
+
+    helm uninstall alloy -n logging || echo
+    cd {{ k8s_manifests_dir }}/charts/alloy
+    sed -i 's/docker.io/{{ registry.local_registry_url }}/g' values.yaml
+    sed -i 's/quay.io/{{ registry.local_registry_url }}/g' values.yaml
+    sed -i 's/ghcr.io/{{ registry.local_registry_url }}/g' values.yaml
+  delegate_to: "{{ groups['master'][0] }}"
+  run_once: true
+  tags: grafana-loki
+
+- name: Helm install grafana-loki
+# backend apply.
+  ansible.builtin.shell: |
+      nohup helm install loki -n logging --create-namespace -f single-binary-values.yaml . &
+  args:
+    chdir: "{{ k8s_manifests_dir }}/charts/loki"
+  delegate_to: "{{ groups['master'][0] }}"
+  run_once: true
+  tags: grafana-loki
+
+- name: Helm install grafana-alloy
+# backend apply.
+  ansible.builtin.shell: |
+      nohup helm install alloy -n logging --create-namespace . &
+  args:
+    chdir: "{{ k8s_manifests_dir }}/charts/alloy"
+  delegate_to: "{{ groups['master'][0] }}"
+  run_once: true
+  tags: grafana-alloy
