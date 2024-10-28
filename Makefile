@@ -6,7 +6,7 @@ uninstall:
 	ansible-playbook uninstall.yml -i inventory -e "flush_iptables=true enable_dual_stack_networks=false"
 
 install:
-	cd roles/addons/files && tar -czf charts.tar.gz charts && cd -
+	cd roles/addons/files && tar -czf charts.tar.gz charts && tar -czf grafana-dashboards-kubernetes.tar.gz grafana-dashboards-kubernetes && cd -
 	@rm -rf certs || echo
 	ansible-playbook 00.allinone.yml -i inventory --skip-tags=create_master_taint
 
@@ -19,6 +19,12 @@ startat:
 		exit 1; \
 	fi
 	ansible-playbook 00.allinone.yml -i inventory --skip-tags=create_master_taint --start-at-task="$(task)"
+
+sync-charts:
+	rsync -avz --delete roles/addons/files/charts 10.20.183.80:/etc/kubernetes/manifests
+
+debug:
+	ansible-playbook debug.yml -i inventory -vvv
 
 registry:
 	ssh 10.20.183.80 "nerdctl -n k8s.io exec local-registry registry garbage-collect -m /etc/docker/registry/config.yml && \
