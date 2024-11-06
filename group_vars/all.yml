@@ -71,7 +71,7 @@ loadbalance:
 # https://github.com/kubernetes/kubernetes
 kubernetes:
   # kubernetes 版本
-  version: v1.31.0
+  version: v1.31.2
   # 集群Pod网段
   pods_subnet: 172.18.0.0/16
   # 集群Service网段
