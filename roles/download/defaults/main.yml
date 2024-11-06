@@ -2,7 +2,8 @@
 # 如使用自建文件服务器，请保证下载路径为: {{ etcd_download_url }}/{{ etcd.version }}/etcd-{{ etcd.version }}-linux-amd64.tar.gz
 etcd_download_url: "https://mirror.ghproxy.com/https://github.com/etcd-io/etcd/releases/download"
 # 如使用自建文件服务器，请保证下载路径为: {{ kubernetes_download_url }}/{{ kubernetes.version }}/bin/linux/amd64/kubectl
-kubernetes_download_url: "https://storage.googleapis.com/kubernetes-release/release"
+# kubernetes_download_url: "https://storage.googleapis.com/kubernetes-release/release"
+kubernetes_download_url: "https://dl.k8s.io/release"
 # 如使用自建文件服务器，请保证下载路径为: {{ runc_download_url }}/{{ runc.version }}/runc.amd64
 runc_download_url: "https://mirror.ghproxy.com/https://github.com/opencontainers/runc/releases/download"
 # 如使用自建文件服务器，请保证下载路径为: {{ cniplugins_download_url }}/{{ cniplugins.version }}/cni-plugins-linux-amd64-{{ cniplugins.version }}.tgz
