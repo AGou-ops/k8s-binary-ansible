@@ -39,7 +39,7 @@
   with_items:
     - etcd
     - master
-    - worker
+    # - worker
   run_once: yes
 
 - name: Fail if non systemd OS type

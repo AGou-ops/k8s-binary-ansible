@@ -117,7 +117,7 @@ helm:
 # https://github.com/containerd/containerd
 containerd:
   # containerd 版本,建议使用1.6.x版本(1.6.x当前为长期稳定版本)
-  version: 1.7.22
+  version: 2.0.0
   # containerd 持久化数据目录，如使用多个目录映射同一块数据盘的方式，请勿修改默认目录
   root: "/var/lib/containerd"
   # containerd 临时数据目录
