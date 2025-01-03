@@ -1,23 +1,11 @@
-- block:
-    - name: Unarchive grafana-dashboards-kubernetes tarball directly to k8s_manifests_dir
-      unarchive:
-        src: grafana-dashboards-kubernetes.tar.gz
-        dest: "{{ k8s_manifests_dir }}"
-        remote_src: no
-        mode: '0755'
-        owner: kube
-        group: kube
-      delegate_to: "{{ groups['master'][0] }}"
-      run_once: true
+- name: "Set containerd service"
+  template:
+    src: "containerd.service.j2"
+    dest: "/usr/lib/systemd/system/containerd.service"
+    owner: root
+    group: root
+    mode: 0644
+  tags: containerd_config
 
-    - name: Install additional grafana kubernetes dashboards
-      ansible.builtin.command:
-        cmd: "kubectl apply -k {{ k8s_manifests_dir }}/grafana-dashboards-kubernetes -n prometheus-stack"
-      delegate_to: "{{ groups['master'][0] }}"
-      retries: 20
-      delay: 15
-      register: dashboard_apply_result
-      until: dashboard_apply_result.rc == 0
-      ignore_errors: true
-      run_once: true
-  tags: prometheus-stack
+- name: "reload and restart containerd"
+  shell: systemctl daemon-reload && systemctl restart containerd

@@ -193,6 +193,7 @@
   shell: systemctl status rsyslog
   register: rsyslog_result
   ignore_errors: true
+  tags: rsyslog
 
 - block:
   - name: "Create dirs for master services logs"

@@ -22,3 +22,4 @@ debug.yml
 /roles/debug/files/*
 /roles/debug/tasks/*
 /roles/debug/templates/*
+/tmp/*

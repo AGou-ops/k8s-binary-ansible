@@ -12,7 +12,15 @@
     helm uninstall cilium -n kube-system || echo
     cd {{ k8s_manifests_dir }}/cilium
     sed -i "s/useDigest: true/useDigest: false/g" values.yaml
-    sed -i 's/repository: "/repository: "{{ registry.local_registry_url }}\//g' values.yaml
+  delegate_to: "{{ groups['master'][0] }}"
+  run_once: true
+  tags: cilium
+
+- name: Replace image registry in cilium chart values
+  ansible.builtin.replace:
+    path: "{{ k8s_manifests_dir }}/cilium/values.yaml"
+    regexp: 'quay.io'
+    replace: "{{ registry.local_registry_url }}"
   delegate_to: "{{ groups['master'][0] }}"
   run_once: true
   tags: cilium

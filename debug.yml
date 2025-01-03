@@ -1,5 +1,5 @@
 - name: "debug"
-  hosts: master[0]
+  hosts: master worker
   roles:
     - role: debug
       tags: debug

@@ -12,6 +12,16 @@
   run_once: true
   tags: prometheus-stack
 
+# - name: Template prometheus-stack values.yaml
+#   template:
+#     src: prom-stack-values.yaml.j2
+#     dest: "{{ k8s_manifests_dir }}/charts/kube-prometheus-stack/values.yaml"
+#     mode: '0755'
+#     owner: kube
+#     group: kube
+#   delegate_to: "{{ groups['master'][0] }}"
+#   tags: prometheus-stack
+
 - name: Replace image registry in prometheus-stack values files
   ansible.builtin.find:
     paths: "{{ k8s_manifests_dir }}/charts/kube-prometheus-stack"
@@ -59,10 +69,22 @@
       ansible.builtin.command:
         cmd: "kubectl apply -k {{ k8s_manifests_dir }}/grafana-dashboards-kubernetes -n prometheus-stack"
       delegate_to: "{{ groups['master'][0] }}"
-      retries: 20
-      delay: 15
-      register: dashboard_apply_result
-      until: dashboard_apply_result.rc == 0
+      async: 300
+      poll: 0
       ignore_errors: true
       run_once: true
+  tags: prometheus-stack
+
+- name: Post patch prometheus version to 3.0.0
+  shell: |
+    kubectl patch prometheus prometheus-stack-kube-prom-prometheus \
+      -n prometheus-stack \
+      --type='json' \
+      -p='[{"op": "replace", "path": "/spec/image", "value": "registry.local:5000/prometheus/prometheus:v3.0.0"}]'
+  delegate_to: "{{ groups['master'][0] }}"
+  retries: 20
+  delay: 5
+  register: prometheus_patch_result
+  until: prometheus_patch_result.rc == 0
+  ignore_errors: true
   tags: prometheus-stack

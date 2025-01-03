@@ -56,7 +56,7 @@
     - /usr/lib/systemd/system/kube-apiserver.service
     - /usr/lib/systemd/system/kube-controller-manager.service
     - /usr/lib/systemd/system/kube-scheduler.service
-    - /usr/lib/systemd/system/kubelet.service.d/10-kubeadm.conf
+    - /usr/lib/systemd/system/kubelet.service.d
     - /usr/lib/systemd/system/kubelet.service
     - /usr/lib/systemd/system/kube-proxy.service
     - /usr/lib/systemd/system/etcd.service

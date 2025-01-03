@@ -26,6 +26,9 @@ kubeconfig: /root/.kube/config
 #     - "ntp3.aliyun.com iburst"
 #     - "ntp4.aliyun.com iburst"
 
+# 外部storageClass
+storage_class_name: local_path
+
 # 镜像仓库源
 registry:
   external_registry_enable: false
@@ -51,7 +54,7 @@ cert:
 # https://github.com/etcd-io/etcd
 etcd:
   # etcd 版本
-  version: v3.5.16
+  version: v3.5.17
   # etcd 数据目录，如使用多个目录映射同一块数据盘的方式，请勿修改默认目录
   data_dir: "/var/lib/etcd"
 
@@ -71,7 +74,7 @@ loadbalance:
 # https://github.com/kubernetes/kubernetes
 kubernetes:
   # kubernetes 版本
-  version: v1.31.2
+  version: v1.31.4
   # 集群Pod网段
   pods_subnet: 172.18.0.0/16
   # 集群Service网段
@@ -92,32 +95,32 @@ kubernetes:
 # https://github.com/opencontainers/runc
 runc:
   # runc 版本
-  version: v1.1.15
+  version: v1.2.3
 
 # https://github.com/containernetworking/plugins
 cniplugins:
   # cni-plugins 版本
-  version: v1.5.1
+  version: v1.6.1
 
 # https://github.com/kubernetes-sigs/cri-tools
 critools:
   # cri-tools 版本
-  version: v1.31.0
+  version: v1.32.0
 
 # https://github.com/containerd/nerdctl
 nerdctl:
   # nerdctl 版本
-  version: v1.7.7
+  version: v2.0.2
 
 # https://github.com/helm/helm
 helm:
   # helm 版本
-  version: v3.16.2
+  version: v3.16.4
 
 # https://github.com/containerd/containerd
 containerd:
   # containerd 版本,建议使用1.6.x版本(1.6.x当前为长期稳定版本)
-  version: 2.0.0
+  version: 2.0.1
   # containerd 持久化数据目录，如使用多个目录映射同一块数据盘的方式，请勿修改默认目录
   root: "/var/lib/containerd"
   # containerd 临时数据目录
@@ -145,7 +148,7 @@ containerd:
     "registry.k8s.io": "https://registry.k8s.io"
 
 # Network Plugin
-network_plugin: flannel
+network_plugin: cilium
 # cilium need linux kernel >= 4.9.17
 cilium:
   # https://github.com/cilium/cilium
