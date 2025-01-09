@@ -27,7 +27,7 @@ kubeconfig: /root/.kube/config
 #     - "ntp4.aliyun.com iburst"
 
 # 外部storageClass
-storage_class_name: local_path
+storage_class_name: local-path
 
 # 镜像仓库源
 registry:

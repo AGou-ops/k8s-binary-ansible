@@ -1,6 +1,15 @@
 
 # 离线安装高可用k8s集群.
 
+## 预先准备
+
+```bash
+# 安装ansible
+pip3 install ansible
+
+pip3 install prisma
+```
+
 ## 快速开始
 
 ```bash
