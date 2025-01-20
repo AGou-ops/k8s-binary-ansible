@@ -3,54 +3,107 @@ logging {
 	format = "logfmt"
 }
 
+// livedebugging {
+//   enabled = true
+// }
+
 discovery.kubernetes "pods" {
 	role = "pod"
 }
 
-discovery.kubernetes "nodes" {
-	role = "node"
+discovery.relabel "pods" {
+  targets = discovery.kubernetes.pods.targets
+  rule {
+    action        = "replace"
+    source_labels = ["__meta_kubernetes_namespace"]
+    target_label  = "namespace"
+  }
+  rule {
+    action        = "replace"
+    source_labels = ["__meta_kubernetes_pod_name"]
+    target_label  = "pod_name"
+  }
+  rule {
+    action        = "replace"
+    source_labels = ["__meta_kubernetes_pod_container_name"]
+    target_label  = "container_name"
+  }
 }
+
+// discovery.kubernetes "nodes" {
+// 	role = "node"
+// }
+//
 
 discovery.kubernetes "services" {
 	role = "service"
 }
 
-discovery.kubernetes "endpoints" {
-	role = "endpoints"
-}
-
-discovery.kubernetes "endpointslices" {
-	role = "endpointslice"
-}
-
-discovery.kubernetes "ingresses" {
-	role = "ingress"
-}
+//
+// discovery.kubernetes "endpoints" {
+// 	role = "endpoints"
+// }
+//
+// discovery.kubernetes "endpointslices" {
+// 	role = "endpointslice"
+// }
+//
+// discovery.kubernetes "ingresses" {
+// 	role = "ingress"
+// }
 
 loki.source.kubernetes "pods" {
-  targets    = discovery.kubernetes.pods.targets
+  targets    = discovery.relabel.pods.output
   forward_to = [loki.write.local.receiver]
 }
 
-loki.source.kubernetes "nodes" {
-  targets    = discovery.kubernetes.nodes.targets
-  forward_to = [loki.write.local.receiver]
-}
-
+// loki.source.kubernetes "nodes" {
+//   targets    = discovery.kubernetes.nodes.targets
+//   forward_to = [loki.write.local.receiver]
+// }
+//
 loki.source.kubernetes "services" {
   targets    = discovery.kubernetes.services.targets
   forward_to = [loki.write.local.receiver]
 }
 
-local.file_match "logs" {
+loki.source.kubernetes_events "events" {
+  // namespaces = ["kube-system"]
+  forward_to = [loki.write.local.receiver]
+}
+
+local.file_match "k8s_logs" {
   path_targets = [
     {__path__ = "/var/log/kubernetes/*/*.log"},
   ]
 }
 
-loki.source.file "tmpfiles" {
-  targets    = local.file_match.logs.targets
+loki.source.file "kubernetes" {
+  targets    = local.file_match.k8s_logs.targets
+  forward_to = [loki.relabel.k8s_relabel_service_name.receiver]
+  tail_from_end = true
+}
+
+loki.relabel "k8s_relabel_service_name" {
+  forward_to = [loki.relabel.k8s_relabels.receiver]
+  rule {
+    action        = "replace"
+    source_labels = ["filename"]
+	target_label = "component"
+    regex         = `.*\/(.*?)\.log`
+    replacement = "$1"
+	}
+}
+
+loki.relabel "k8s_relabels" {
   forward_to = [loki.write.local.receiver]
+  rule {
+    action        = "replace"
+    source_labels = ["filename"]
+	target_label = "k8s_interlnal_svc_log"
+    regex         = `.*\/(.*?)\.log`
+    replacement = "$1"
+  }
 }
 
 loki.write "local" {

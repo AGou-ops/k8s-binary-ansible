@@ -19,7 +19,7 @@ local-registry-data.tar.gz
 local-registry-data.tar.gz.bak
 local-registry-data.tar.gz.bak.*
 debug.yml
-/roles/debug/files/*
-/roles/debug/tasks/*
-/roles/debug/templates/*
 /tmp/*
+roles/debug/tasks
+roles/debug/templates
+roles/debug/files
