@@ -1,7 +1,7 @@
 # Download offline package
 download:
   # 离线包保存目录，节点安装包从该目录拷贝
-  dest: /Users/mingday/.ansible/workspace/ansible-deploy-k8s-binary/k8s/binary
+  dest: ./binary
 
   # 下载超时时间
   timeout: 60
@@ -45,7 +45,7 @@ repo:
 # Kubernetes Cert
 cert:
   # 签发集群整数保存目录，默认签发10年有限期证书
-  dir: /Users/mingday/.ansible/workspace/ansible-deploy-k8s-binary/k8s/certs
+  dir: ./certs
   # 签发证书大小
   size: 2048
   # 签发证书的时间
@@ -74,7 +74,7 @@ loadbalance:
 # https://github.com/kubernetes/kubernetes
 kubernetes:
   # kubernetes 版本
-  version: v1.31.4
+  version: v1.32.1
   # 集群Pod网段
   pods_subnet: 172.18.0.0/16
   # 集群Service网段
