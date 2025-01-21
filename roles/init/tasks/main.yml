@@ -141,6 +141,7 @@
     - {name: 'net.ipv4.tcp_keepalive_probes',value: '10' }
     - {name: 'net.ipv4.ip_local_port_range',value: '20000 60999' }
     - {name: 'net.ipv4.ip_nonlocal_bind',value: '1' }
+    - {name: 'fs.inotify.max_user_instances',value: '8192' }
   tags: sysctl
 
 - name: "Config systemd-journald"

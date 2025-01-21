@@ -111,3 +111,25 @@ loki.write "local" {
         url = "http://loki-headless.logging.svc.cluster.local:3100/loki/api/v1/push"
     }
 }
+
+// ------ prometheus below
+
+discovery.docker "containers" {
+  host = "tcp://10.50.86.69:2375"
+}
+
+prometheus.scrape "docker_69" {
+  targets    = discovery.docker.containers.targets
+  forward_to = [prometheus.remote_write.docker.receiver]
+}
+
+prometheus.remote_write "docker" {
+  endpoint {
+    url = "http://prometheus-stack-kube-prom-prometheus.prometheus-stack.svc.cluster.local:9090/api/prom/push"
+
+    // basic_auth {
+    //   username = USERNAME
+    //   password = PASSWORD
+    // }
+  }
+}

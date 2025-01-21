@@ -69,8 +69,10 @@
       ansible.builtin.command:
         cmd: "kubectl apply -k {{ k8s_manifests_dir }}/grafana-dashboards-kubernetes -n prometheus-stack"
       delegate_to: "{{ groups['master'][0] }}"
-      async: 300
-      poll: 0
+      retries: 20
+      delay: 5
+      register: additional_dashboard_result
+      until: additional_dashboard_result.rc == 0
       ignore_errors: true
       run_once: true
   tags: prometheus-stack
