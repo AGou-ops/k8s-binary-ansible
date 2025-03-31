@@ -51,6 +51,9 @@ vpn: pull-pki
 	kubevpn disconnect 0 || echo
 	kubevpn connect --image registry.local:5000/naison/kubevpn:v2.3.2
 
+etcd:
+	@echo etcdctl --cacert=./certs/etcd-ca.pem --cert=./certs/10.20.183.57/etcd-server.pem --key=./certs/10.20.183.57/etcd-server.key --endpoints https://10.20.183.57:2379 endpoint status --cluster -w table
+
 help:
 	@echo "Usage:"
 	@echo "  make                 # Run the install playbook (default)"

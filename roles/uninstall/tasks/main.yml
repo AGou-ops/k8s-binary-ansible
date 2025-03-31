@@ -44,6 +44,7 @@
     pkill -9 kubelet || echo
     pkill -9 node-cache || echo
     pkill -9 kube-controller || echo
+    pkill -9 registry || echo
   ignore_errors: yes
   tags:
     - stop_service
