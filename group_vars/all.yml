@@ -152,7 +152,7 @@ network_plugin: cilium
 # cilium need linux kernel >= 4.9.17
 cilium:
   # https://github.com/cilium/cilium
-  version: v1.16.1
+  version: v1.17.2
   # {{cilium.registry}}/operator-generic:{{cilium.version}}
   # {{cilium.registry}}/cilium:{{cilium.version}}
   registry: registry.local:5000/cilium

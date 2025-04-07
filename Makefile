@@ -49,10 +49,13 @@ pull-pki:
 
 vpn: pull-pki
 	kubevpn disconnect 0 || echo
-	kubevpn connect --image registry.local:5000/naison/kubevpn:v2.3.2
+	kubevpn connect --image registry.local:5000/naison/kubevpn:v2.6.0
 
 etcd:
 	@echo etcdctl --cacert=./certs/etcd-ca.pem --cert=./certs/10.20.183.57/etcd-server.pem --key=./certs/10.20.183.57/etcd-server.key --endpoints https://10.20.183.57:2379 endpoint status --cluster -w table
+
+web-ui:
+	@docker run -d --name ansible-webui -v `pwd`:/play -p 8000:8000 oxlorg/ansible-webui:latest
 
 help:
 	@echo "Usage:"
