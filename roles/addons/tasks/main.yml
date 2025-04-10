@@ -8,6 +8,12 @@
   tags:
     - nodelocaldns
 
+- name: Include registry-ui role
+  include_role:
+    name: registry
+    tasks_from: registry-ui
+  tags: registry-ui
+
 - import_tasks: metrics-server.yml
   when: metrics_server.enabled == true
   tags:
