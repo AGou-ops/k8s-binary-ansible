@@ -54,7 +54,7 @@ cert:
 # https://github.com/etcd-io/etcd
 etcd:
   # etcd 版本
-  version: v3.5.17
+  version: v3.6.0
   # etcd 数据目录，如使用多个目录映射同一块数据盘的方式，请勿修改默认目录
   data_dir: "/var/lib/etcd"
 
@@ -74,7 +74,7 @@ loadbalance:
 # https://github.com/kubernetes/kubernetes
 kubernetes:
   # kubernetes 版本
-  version: v1.32.3
+  version: v1.32.5
   # 集群Pod网段
   pods_subnet: 172.18.0.0/16
   # 集群Service网段
@@ -95,32 +95,32 @@ kubernetes:
 # https://github.com/opencontainers/runc
 runc:
   # runc 版本
-  version: v1.2.6
+  version: v1.3.0
 
 # https://github.com/containernetworking/plugins
 cniplugins:
   # cni-plugins 版本
-  version: v1.6.2
+  version: v1.7.1
 
 # https://github.com/kubernetes-sigs/cri-tools
 critools:
   # cri-tools 版本
-  version: v1.32.0
+  version: v1.33.0
 
 # https://github.com/containerd/nerdctl
 nerdctl:
   # nerdctl 版本
-  version: v2.0.4
+  version: v2.1.1
 
 # https://github.com/helm/helm
 helm:
   # helm 版本
-  version: v3.17.2
+  version: v3.17.3
 
 # https://github.com/containerd/containerd
 containerd:
   # containerd 版本,建议使用1.6.x版本(1.6.x当前为长期稳定版本)
-  version: 2.0.4
+  version: 2.0.5
   # containerd 持久化数据目录，如使用多个目录映射同一块数据盘的方式，请勿修改默认目录
   root: "/var/lib/containerd"
   # containerd 临时数据目录

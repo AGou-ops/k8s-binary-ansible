@@ -59,15 +59,15 @@
     - /usr/lib/systemd/system/kube-scheduler.service
     - /usr/lib/systemd/system/kubelet.service.d
     - /usr/lib/systemd/system/kubelet.service
+    - /usr/local/lib/systemd/system/kube-apiserver.service
+    - /usr/local/lib/systemd/system/kube-controller-manager.service
+    - /usr/local/lib/systemd/system/kube-scheduler.service
+    - /usr/local/lib/systemd/system/kubelet.service
     - /usr/lib/systemd/system/kube-proxy.service
     - /usr/lib/systemd/system/etcd.service
     - /etc/systemd/system/etcd.service
     # - /usr/lib/systemd/system/haproxy.service
     # - /usr/lib/systemd/system/keepalived.service
-    - /etc/sysconfig/kubelet
-    - /etc/kubernetes
-    - /usr/bin/kubelet
-    - /usr/bin/kube-proxy
   register: services_removed
   tags:
     - services
@@ -365,6 +365,7 @@
     state: absent
   with_items:
     - /data/local-registry
+    - /etc/kubernetes
     - /tmp/charts.tar.gz
     - /tmp/registry.tar
     - /etc/docker/registry
@@ -375,6 +376,10 @@
     - /usr/bin/nerdctl
     - /usr/bin/helm
     - /usr/local/bin/helm
+    - /etc/sysconfig/kubelet
+    - /usr/bin/kubelet
+    - /usr/bin/kube-proxy
+    - /usr/local/bin/kubelet
     - /var/log/kubernetes
     - /etc/rsyslog.d/k8s-master.conf
     - /etc/rsyslog.d/k8s-worker.conf
