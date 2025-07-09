@@ -45,6 +45,7 @@ registry:
 pull-pki:
 	scp -r 10.20.183.57:/root/.kube/config ~/.kube/config
 	chmod 600 ~/.kube/config
+	sed -i "s/localhost:9443/10.20.183.57:6443/" ~/.kube/config
 	# kubectl konfig import --save ~/.kube/config.88
 
 vpn: pull-pki

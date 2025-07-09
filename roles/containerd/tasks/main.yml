@@ -1,63 +1,4 @@
 ---
-# TODO: fix \"unknown\" package manager
-# - name: "Install dependency"
-#   package:
-#     name:
-#       - util-linux
-#       - libseccomp
-#       - libseccomp-devel
-#     state: present
-#   when:
-#     - ansible_os_family in ['RedHat', 'AlmaLinux', 'Rocky']
-#   tags: containerd_app
-#
-# - name: "Install dependency"
-#   package:
-#     name:
-#       - util-linux
-#       - libseccomp2
-#     state: present
-#   when:
-#     - ansible_os_family in ["Debian"]
-#   tags: containerd_app
-
-# - name: "Add nvidia-container-toolkit repository"
-#   yum_repository:
-#     name: "{{ item.name }}"
-#     description: "{{ item.description}}"
-#     file: nvidia-container-toolkit
-#     baseurl: "{{ item.baseurl }}"
-#     repo_gpgcheck: no
-#     gpgcheck: no
-#     sslverify: yes
-#     sslcacert: "/etc/pki/tls/certs/ca-bundle.crt"
-#     enabled: yes
-#   with_items:
-#     - { name: "nvidia-container-toolkit",description: "nvidia-container-toolkit",baseurl: "{{ repo.nvidia_container_toolkit_centos }}" }
-#   when:
-#     - gpu is defined and gpu == 'true'
-#     - ansible_os_family in ['RedHat', 'AlmaLinux', 'Rocky']
-#   tags: gpu_runtime
-#
-# - name: "Add nvidia-container-toolkit repository"
-#   apt_repository:
-#     repo: "{{ repo.nvidia_container_toolkit_ubuntu }}"
-#     filename: nvidia-container-toolkit
-#     state: present
-#   when:
-#     - gpu is defined and gpu == 'true'
-#     - ansible_os_family in ["Debian"]
-#   tags: gpu_runtime
-#
-# - name: "Install nvidia-container-runtime"
-#   package:
-#     name:
-#       - nvidia-container-runtime
-#       - nvidia-container-toolkit
-#     state: present
-#   when: gpu is defined and gpu == 'true'
-#   tags: gpu_app
-
 - name: Install runc
   copy:
     src: "{{ download.dest }}/runc/{{ runc.version }}/runc.amd64"
@@ -91,14 +32,24 @@
     mode: '0755'
   tags: cni_config
 
-- name: Install containerd
+# 使用下面的full包进行代替
+# - name: Install containerd
+#   unarchive:
+#     src: "{{ download.dest }}/containerd/v{{ containerd.version }}/containerd-{{ containerd.version }}-linux-amd64.tar.gz"
+#     dest: "/usr/local/bin/"
+#     remote_src: no
+#     extra_opts:
+#       - --strip-components=1
+#   tags: install_containerd
+#   notify:
+#     - restart containerd
+
+- name: Install nerdctl & containerd
   unarchive:
-    src: "{{ download.dest }}/containerd/v{{ containerd.version }}/containerd-{{ containerd.version }}-linux-amd64.tar.gz"
-    dest: "/usr/local/bin/"
+    src: "{{ download.dest }}/nerdctl/{{ nerdctl.version }}/nerdctl-full-{{ nerdctl.version.replace('v', '') }}-linux-amd64.tar.gz"
+    dest: "/usr/local/"
     remote_src: no
-    extra_opts:
-      - --strip-components=1
-  tags: install_containerd
+  tags: install_nerdctl_containerd
   notify:
     - restart containerd
 
@@ -181,10 +132,3 @@
     group: root
     mode: 0644
   tags: cri_tools
-
-- name: Install nerdctl
-  unarchive:
-    src: "{{ download.dest }}/nerdctl/{{ nerdctl.version }}/nerdctl-{{ nerdctl.version.replace('v', '') }}-linux-amd64.tar.gz"
-    dest: "/usr/local/bin/"
-    remote_src: no
-  tags: install_nerdctl

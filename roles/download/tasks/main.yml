@@ -87,18 +87,19 @@
   delay: "{{ download.retry_stagger | default(5) }}"
   tags: download_critools
 
-- name: "Download containerd"
-  get_url:
-    url: "{{ containerd_download_url }}/v{{ containerd.version }}/containerd-{{ containerd.version }}-linux-amd64.tar.gz"
-    dest: "{{ download.dest }}/containerd/v{{ containerd.version }}"
-    timeout: "{{ download.timeout }}"
-  register: get_url_result
-  until: "'OK' in get_url_result.msg or
-      'file already exists' in get_url_result.msg or
-      get_url_result.status_code | default() == 304"
-  retries: "{{ download.retries }}"
-  delay: "{{ download.retry_stagger | default(5) }}"
-  tags: download_containerd
+# 使用nerdctl full包代替containerd
+# - name: "Download containerd"
+#   get_url:
+#     url: "{{ containerd_download_url }}/v{{ containerd.version }}/containerd-{{ containerd.version }}-linux-amd64.tar.gz"
+#     dest: "{{ download.dest }}/containerd/v{{ containerd.version }}"
+#     timeout: "{{ download.timeout }}"
+#   register: get_url_result
+#   until: "'OK' in get_url_result.msg or
+#       'file already exists' in get_url_result.msg or
+#       get_url_result.status_code | default() == 304"
+#   retries: "{{ download.retries }}"
+#   delay: "{{ download.retry_stagger | default(5) }}"
+#   tags: download_containerd
 
 - name: "Download calicoctl"
   get_url:
@@ -115,7 +116,7 @@
 
 - name: "Download nerdctl"
   get_url:
-    url: "{{ nerdctl_download_url }}/{{ nerdctl.version }}/nerdctl-{{ nerdctl.version.replace('v', '') }}-linux-amd64.tar.gz"
+    url: "{{ nerdctl_download_url }}/{{ nerdctl.version }}/nerdctl-full-{{ nerdctl.version.replace('v', '') }}-linux-amd64.tar.gz"
     dest: "{{ download.dest }}/nerdctl/{{ nerdctl.version }}"
     timeout: "{{ download.timeout }}"
   register: get_url_result
