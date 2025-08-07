@@ -125,17 +125,17 @@ data:
 
     // ------ prometheus below
 
-    discovery.docker "containers" {
-      host = "tcp://10.50.86.69:2375"
-    }
+    // discovery.docker "containers" {
+    //   host = "tcp://10.50.86.69:2375"
+    // }
 
-    prometheus.scrape "docker_69" {
-      targets    = discovery.docker.containers.targets
-      forward_to = [prometheus.remote_write.docker.receiver]
-    }
+    // prometheus.scrape "docker_69" {
+    //   targets    = discovery.docker.containers.targets
+    //   forward_to = [prometheus.remote_write.docker.receiver]
+    // }
 
-    prometheus.remote_write "docker" {
-      endpoint {
-        url = "http://prometheus-stack-kube-prom-prometheus.prometheus-stack.svc.cluster.local:9090/api/prom/push"
-      }
-    }
+    // prometheus.remote_write "docker" {
+    //   endpoint {
+    //     url = "http://prometheus-stack-kube-prom-prometheus.prometheus-stack.svc.cluster.local:9090/api/prom/push"
+    //   }
+    // }

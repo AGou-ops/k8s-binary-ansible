@@ -33,8 +33,9 @@ storage_class_name: local-path
 registry:
   external_registry_enable: false
   external_registry_url: docker.io
-  local_registry_url: registry.local:5000
-
+  local_registry_url:
+    - registry.local:5000
+    - harbor.k8s.local
 
 # Repository 软件源
 repo:
@@ -74,7 +75,7 @@ loadbalance:
 # https://github.com/kubernetes/kubernetes
 kubernetes:
   # kubernetes 版本
-  version: v1.33.2
+  version: v1.33.3
   # 集群Pod网段
   pods_subnet: 172.18.0.0/16
   # 集群Service网段
@@ -208,27 +209,31 @@ kuberouter:
   # 启用服务代理，为Kubernetes服务设置IPVS
   run_service_proxy: false
 
-# Addons
+# ---------------------------- Addons ----------------------------
 coredns:
   version: 1.11.1
   # {{coredns.registry}}/coredns:{{coredns.version}}
   registry: registry.local:5000/coredns
+
 nodelocaldns:
   enabled: true
   version: 1.23.0
   # {{nodelocaldns.registry}}/k8s-dns-node-cache:{{nodelocaldns.version}}
   registry: registry.local:5000/dns
   ip: 169.254.20.10
+
 metrics_server:
   enabled: true
   version: v0.7.1
   # {{metrics_server.registry}}/metrics-server:{{metrics_server.version}}
   registry: registry.local:5000/metrics-server
+
 npd:
   enabled: false
   version: v0.8.18
   # {{npd.registry}}/node-problem-detector:{{npd.version}}
   registry: registry.local:5000/node-problem-detector
+
 nvidia_device_plugin:
   enabled: false
   version: v0.15.0
@@ -253,5 +258,9 @@ prometheus_stack:
   version: x.x.x
 
 grafana_loki:
+  enabled: true
+  version: x.x.x
+
+harbor:
   enabled: true
   version: x.x.x

@@ -26,7 +26,7 @@ loki:
   auth_enabled: false
 
 lokiCanary:
-  enabled: true
+  enabled: false
   image:
     # -- The Docker registry
     registry: docker.io
@@ -38,6 +38,9 @@ lokiCanary:
     digest: null
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
+
+test:
+  enabled: false
 
 #gateway:
 #  ingress:

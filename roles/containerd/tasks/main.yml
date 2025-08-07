@@ -80,12 +80,12 @@
     state: directory
   tags: containerd_config
 
-- name: "Create containerd cert.d directory"
+- name: "Create containerd cert.d directory for each registry server"
   file:
-    path: "/etc/containerd/certs.d/{{ registry_server }}"
+    path: "/etc/containerd/certs.d/{{ item }}"
     state: directory
     mode: '0755'
-    force: yes
+  loop: "{{ registry_server }}"
 
 - name: "Copy root-ca.crt to /etc/containerd/"
   ansible.builtin.copy:
@@ -95,13 +95,16 @@
     group: root
     mode: '0644'
 
-- name: "Template hosts.toml.j2"
+- name: "Template hosts.toml.j2 for each registry server"
   ansible.builtin.template:
     src: hosts.toml.j2
-    dest: "/etc/containerd/certs.d/{{ registry_server }}/hosts.toml"
+    dest: "/etc/containerd/certs.d/{{ registry_host }}/hosts.toml"
     owner: root
     group: root
     mode: '0644'
+  loop: "{{ registry_server }}"
+  loop_control:
+    loop_var: registry_host
 
 - name: "Template containerd config"
   template:

@@ -1436,7 +1436,8 @@ grafana:
   ## ref: https://grafana.com/docs/grafana/latest/administration/provisioning/#datasources
   additionalDataSources:
   - name: grafana-loki
-    access: direct
+    # access: direct
+    access: proxy
     basicAuth: false
     basicAuthPassword: pass
     basicAuthUser: daco

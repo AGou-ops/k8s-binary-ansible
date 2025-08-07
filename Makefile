@@ -50,7 +50,8 @@ pull-pki:
 
 vpn: pull-pki
 	kubevpn disconnect 0 || echo
-	kubevpn connect --image registry.local:5000/naison/kubevpn:v2.6.0
+	# kubevpn connect --image registry.local:5000/naison/kubevpn:v2.9.1
+	kubevpn connect
 
 etcd:
 	@echo etcdctl --cacert=./certs/etcd-ca.pem --cert=./certs/10.20.183.57/etcd-server.pem --key=./certs/10.20.183.57/etcd-server.key --endpoints https://10.20.183.57:2379 endpoint status --cluster -w table
